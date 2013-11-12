@@ -9,14 +9,13 @@ void initializeRobot(){
   return;
 }
 
-/*----------------------------------------End Gyro Position Compensation------------------------------*/
 
 task drive(){
 	while(true){
-	  motor(LeftFront) = X+Y+joystick.joy1_x2;
-	  motor(LeftBack) = Y-X+joystick.joy1_x2;
-	  motor(RightFront) = X-Y+joystick.joy1_x2;
-	  motor(RightBack) = joystick.joy1_x2-X-Y;
+	  motor(LeftFront) =
+	  motor(LeftBack) =
+	  motor(RightFront) =
+	  motor(RightBack) =
 	  abortTimeslice();
 	 }
 }
