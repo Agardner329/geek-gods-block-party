@@ -1,0 +1,12 @@
+#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTMotor)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S2,     Inf,            sensorHiTechnicIRSeeker1200)
+#pragma config(Motor,  mtr_S1_C1_1,     RF,            tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C1_2,     RB,            tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     LF,            tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     LB,            tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_1,     motorH,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_2,     motorI,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_1,     motorJ,        tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_2,     motorK,        tmotorTetrix, openLoop)
+
