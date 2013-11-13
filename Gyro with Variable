@@ -1,0 +1,51 @@
+#pragma config(Sensor, S4,     HTGYRO,         sensorI2CHiTechnicGyro)
+//This is the sickest piece of code you ever saw
+//
+//Displays on the screen the gyro (port 4) degrees from start
+//Acurate to 5 degrees of drift in 2 min
+//Positive numbers go clockwise
+
+#include "drivers/hitechnic-gyro.h"
+
+task main ()
+{
+ /*-----------------------------------Start Gyro Position Compensation-------------------------------*/
+	float rotSpeed = 0;
+  float heading = 0;
+
+  // Calibrating
+  HTGYROstartCal(HTGYRO);
+
+  // Reset the timer.
+  time1[T1] = 0;
+  int t = 0;
+  while (true)
+  {
+  if (t == 0){
+  	t = 1;
+	}else if(t == 1){
+		t = 0;
+	}
+      wait1Msec(50);
+
+    // Read rotation speed
+    rotSpeed = HTGYROreadRot(HTGYRO);
+
+    /* Calculate the new heading by adding the amount of degrees
+     we've turned in the last 20ms
+     If our current rate of rotation is 100 degrees/second,
+     then we will have turned 100 * (20/1000) = 2 degrees since
+    the last time we measured.*/
+    if (t == 1){float timelapsed = time1[1];
+    	heading += rotSpeed * (timelapsed / 1000);
+    	time1[T1]=0;
+    }
+    float timer = time1[T1];
+
+    // Display degrees from start position
+    nxtDisplayCenteredTextLine(3, "Gyro: %2.3f", heading);
+    nxtDisplayCenteredTextLine(4, "t = %f", t);
+    nxtDisplayCenteredTextLine(2, "Timer: %f", timer);
+  }
+}
+/*----------------------------------------End Gyro Position Compensation------------------------------*/
