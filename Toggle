@@ -1,0 +1,8 @@
+if(("condition" == 1) && (switcha == 0)){
+  switcha = 1;
+}
+if(('Condition == 0) && (switcha == 1)){
+  switcha = 0;
+  switchb *= -1;
+}
+//Switchb will represent which toggle you are in
