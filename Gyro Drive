@@ -57,15 +57,16 @@ task main(){
 			PlayTone(784,15);	wait10Msec(19);
 			PlayTone(784,15);	wait10Msec(19);
 			PlayTone(622,38);	wait10Msec(38);
-			while(true){
-
-				/*-----------------------------------Start Gyro Position Compensation-------------------------------*/
-
 				//Gyro goes in port 4
 				float rotSpeed = 0;
 				float heading = 0;
 				// Calibrating
 				HTGYROstartCal(HTGYRO);
+			while(true){
+
+				/*-----------------------------------Start Gyro Position Compensation-------------------------------*/
+
+
 				// Reset the timer.
 				time1[T1] = 0;
 
@@ -89,10 +90,10 @@ task main(){
 				long X = (joy1_x1*cos((heading*PI)/180)) + (joy1_y1*sin((heading*PI)/180));
 				long Y = (joy1_y1*cos((heading*PI)/180)) - (joy1_x1*sin((heading*PI)/180));
 
-				motor(blue) = X+Y+joy1_x2;
-				motor(green) = Y-X+joy1_x2;
-				motor(red) = X-Y+joy1_x2;
-				motor(yellow) = joy1_x2-X-Y;
+				motor(blue) = X+Y+joystick.joy1_x2;
+				motor(green) = Y-X+joystick.joy1_x2;
+				motor(red) = X-Y+joystick.joy1_x2;
+				motor(yellow) = joystick.joy1_x2-X-Y;
 			}
 		}
 
