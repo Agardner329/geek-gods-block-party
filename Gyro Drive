@@ -24,6 +24,7 @@
 #include "JoystickDriver.c";
 #include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\hitechnic-gyro.h";
 string direction = "yellow";
+int gyroloop = 0;
 void initializeRobot(){
 	return;
 }
@@ -57,12 +58,13 @@ task main(){
 			PlayTone(784,15);	wait10Msec(19);
 			PlayTone(784,15);	wait10Msec(19);
 			PlayTone(622,38);	wait10Msec(38);
-				//Gyro goes in port 4
-				float rotSpeed = 0;
-				float heading = 0;
-				// Calibrating
-				HTGYROstartCal(HTGYRO);
-			while(true){
+			gyroloop = 1;
+			//Gyro goes in port 4
+			float rotSpeed = 0;
+			float heading = 0;
+			// Calibrating
+			HTGYROstartCal(HTGYRO);
+			while(gyroloop == 1){
 
 				/*-----------------------------------Start Gyro Position Compensation-------------------------------*/
 
@@ -84,16 +86,23 @@ task main(){
 				the last time we measured.*/
 				heading += rotSpeed * 0.02;
 				// Display degrees from start position
-				nxtDisplayCenteredTextLine(3, "Gyro: %2.3f", heading);
+				nxtDisplayCenteredTextLine(1, "Gyro: %2.3f", heading);
 
 				/*-----------------------------------End Gyro Position Compensation-------------------------------*/
-				long X = (joy1_x1*cos((heading*PI)/180)) + (joy1_y1*sin((heading*PI)/180));
-				long Y = (joy1_y1*cos((heading*PI)/180)) - (joy1_x1*sin((heading*PI)/180));
+				long X = (joystick.joy1_x1*cos((heading*PI)/180)) + (joystick.joy1_y1*sin((heading*PI)/180));
+				long Y = (joystick.joy1_y1*cos((heading*PI)/180)) - (joystick.joy1_x1*sin((heading*PI)/180));
 
 				motor(blue) = X+Y+joystick.joy1_x2;
 				motor(green) = Y-X+joystick.joy1_x2;
 				motor(red) = X-Y+joystick.joy1_x2;
 				motor(yellow) = joystick.joy1_x2-X-Y;
+				if(joy1Btn(9)){
+					PlayTone(622,38);	wait10Msec(38);
+					PlayTone(784,15);	wait10Msec(19);
+					PlayTone(784,15);	wait10Msec(19);
+					PlayTone(784,15);	wait10Msec(19);
+					gyroloop = 0;
+				}
 			}
 		}
 
@@ -101,6 +110,7 @@ task main(){
 		//                            End Gyro Mode Zone                                  //
 		////////////////////////////////////////////////////////////////////////////////////
 
+		nxtDisplayCenteredTextLine(1, "Gyro Mode Disabled");
 		//driving bit
 		getJoystickSettings(joystick);
 		if(direction == "red"){
@@ -155,7 +165,7 @@ task main(){
 			}else{
 			motor[arm] = 0;}
 
-
-
+		//waiting 20ms to prevent buffering
+		wait10Msec(2);
 	}
 }
