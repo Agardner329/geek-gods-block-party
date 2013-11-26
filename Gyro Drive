@@ -11,9 +11,9 @@
 #pragma config(Motor,  mtr_S1_C3_1,     lift,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C3_2,     flag,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C4_1,     arm,           tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S1_C4_2,     motorK,        tmotorTetrix, openLoop)
-#pragma config(Servo,  srvo_S3_C1_1,    servo1,               tServoNone)
-#pragma config(Servo,  srvo_S3_C1_2,    servo2,               tServoNone)
+#pragma config(Motor,  mtr_S1_C4_2,     whisk,          tmotorTetrix, openLoop)
+#pragma config(Servo,  srvo_S3_C1_1,    autoflipper,          tServoStandard)
+#pragma config(Servo,  srvo_S3_C1_2,    wrist,                tServoStandard)
 #pragma config(Servo,  srvo_S3_C1_3,    servo3,               tServoNone)
 #pragma config(Servo,  srvo_S3_C1_4,    servo4,               tServoNone)
 #pragma config(Servo,  srvo_S3_C1_5,    servo5,               tServoNone)
@@ -22,12 +22,7 @@
 
 // Gyro Drive.c
 
-////////////---PORTS---/////////////
-// Main motor hub - Port 1				//
-// Infered Sensor - Port 2				//
-// Servo motor hub - Port 3				//
-// Gyro sensor - Port 4						//
-////////////////////////////////////
+
 
 
 
@@ -163,19 +158,27 @@ task main(){
 			}else{
 			motor[lift] = 0;}
 		//flag spinner conrols
-		if(joy1Btn(7)){
+		if(joy1Btn(5)){
 			motor[flag] = -100;
-			}else if(joy1Btn(5)){
-			motor[flag] = 100;
 			}else{
-			motor[flag] = 0;}
+			motor[flag] = 0;
+		}
 		//arm controls
 		if(joystick.joy1_TopHat == 4){
 			motor[arm] = -100;
+			servo[wrist] -= 1;
 			}else if(joystick.joy1_TopHat == 0){
 			motor[arm] = 100;
+			servo[wrist] += 1;
 			}else{
 			motor[arm] = 0;}
+
+		//wisk control
+		if(joy1Btn(7)){
+			motor[whisk] = 100;
+			}else{
+			motor[whisk] = 0;
+		}
 
 		//waiting 20ms to prevent buffering
 		wait10Msec(2);
