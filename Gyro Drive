@@ -22,11 +22,6 @@
 
 // Gyro Drive.c
 
-
-
-
-
-
 #include "JoystickDriver.c";
 #include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\hitechnic-gyro.h";
 //default direction yellow
@@ -42,7 +37,16 @@ float DZ(float input){
 		return input;
 	}
 }
+
+
+
 task main(){
+	
+	//makes sound so you know the program started correctly
+	PlayTone(500,20);	wait10Msec(20);
+	PlayTone(600,20);	wait10Msec(20);
+	PlayTone(600,20);	wait10Msec(20);
+	
 	while(true){
 		//directional buttons
 		getJoystickSettings(joystick);
