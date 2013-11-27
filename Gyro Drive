@@ -41,13 +41,14 @@ float DZ(float input){
 
 
 task main(){
-	
+
 	//makes sound so you know the program started correctly
 	PlayTone(500,20);	wait10Msec(20);
 	PlayTone(600,20);	wait10Msec(20);
 	PlayTone(600,20);	wait10Msec(20);
-	
+
 	while(true){
+
 		//directional buttons
 		getJoystickSettings(joystick);
 		if(joy1Btn(1)){
@@ -66,62 +67,74 @@ task main(){
 		////////////////////////////////////////////////////////////////////////////////////
 
 		//enter gyro mode
-		if(joy1Btn(9)){
-			PlayTone(784,15);	wait10Msec(19);
-			PlayTone(784,15);	wait10Msec(19);
-			PlayTone(784,15);	wait10Msec(19);
-			PlayTone(622,38);	wait10Msec(38);
-			gyroloop = 1;
-			//Gyro goes in port 4
-			float rotSpeed = 0;
-			float heading = 0;
-			// Calibrating
-			HTGYROstartCal(HTGYRO);
-			while(gyroloop == 1){
+		// Hold down both buttons 9 and 10 (should be middle buttons)
+		if((joy1Btn(9)) && (joy1Btn(10))){
+			wait10Msec(50);
+			if((joy1Btn(9)) && (joy1Btn(10))){
+				wait10Msec(50);
+				if(((joy1Btn(9)) && (joy1Btn(10)))){
 
-				// Reset the timer.
-				time1[T1] = 0;
-
-				// timeout 20ms
-				while (time1[T1] < 20)
-					wait1Msec(1);
-				// Reset timer
-				time1[T1]=0;
-				// Read rotation speed
-				rotSpeed = HTGYROreadRot(HTGYRO);
-				/* Calculate the new heading by adding the amount of degrees
-				we've turned in the last 20ms
-				If our current rate of rotation is 100 degrees/second,
-				then we will have turned 100 * (20/1000) = 2 degrees since
-				the last time we measured.*/
-				heading += rotSpeed * 0.02;
-				// Display degrees from start position
-				nxtDisplayCenteredTextLine(1, "Gyro: %2.3f", heading);
-
-				long X = (joystick.joy1_x1*cos((heading*PI)/180)) + (joystick.joy1_y1*sin((heading*PI)/180));
-				long Y = (joystick.joy1_y1*cos((heading*PI)/180)) - (joystick.joy1_x1*sin((heading*PI)/180));
-
-				motor(blue) = X+Y+joystick.joy1_x2;
-				motor(green) = Y-X+joystick.joy1_x2;
-				motor(red) = X-Y+joystick.joy1_x2;
-				motor(yellow) = joystick.joy1_x2-X-Y;
-
-				//exit gyro mode
-				if(joy1Btn(9)){
+					PlayTone(784,15);	wait10Msec(19);
+					PlayTone(784,15);	wait10Msec(19);
+					PlayTone(784,15);	wait10Msec(19);
 					PlayTone(622,38);	wait10Msec(38);
-					PlayTone(784,15);	wait10Msec(19);
-					PlayTone(784,15);	wait10Msec(19);
-					PlayTone(784,15);	wait10Msec(19);
-					gyroloop = 0;
-				}
-			}
-		}
+					gyroloop = 1;
+					//Gyro goes in port 4
+					float rotSpeed = 0;
+					float heading = 0;
+					// Calibrating
+					HTGYROstartCal(HTGYRO);
+					while(gyroloop == 1){
+
+						// Reset the timer.
+						time1[T1] = 0;
+
+						// timeout 20ms
+						while (time1[T1] < 20)
+							wait1Msec(1);
+						// Reset timer
+						time1[T1]=0;
+						// Read rotation speed
+						rotSpeed = HTGYROreadRot(HTGYRO);
+						/* Calculate the new heading by adding the amount of degrees
+						we've turned in the last 20ms
+						If our current rate of rotation is 100 degrees/second,
+						then we will have turned 100 * (20/1000) = 2 degrees since
+						the last time we measured.*/
+						heading += rotSpeed * 0.02;
+						// Display degrees from start position
+						nxtDisplayCenteredTextLine(1, "Gyro: %2.3f", heading);
+
+						long X = (joystick.joy1_x1*cos((heading*PI)/180)) + (joystick.joy1_y1*sin((heading*PI)/180));
+						long Y = (joystick.joy1_y1*cos((heading*PI)/180)) - (joystick.joy1_x1*sin((heading*PI)/180));
+
+						motor(blue) = X+Y+joystick.joy1_x2;
+						motor(green) = Y-X+joystick.joy1_x2;
+						motor(red) = X-Y+joystick.joy1_x2;
+						motor(yellow) = joystick.joy1_x2-X-Y;
+
+						//exit gyro mode
+						if((joy1Btn(9)) && (joy1Btn(10))){
+							wait10Msec(50);
+							if((joy1Btn(9)) && (joy1Btn(10))){
+								wait10Msec(50);
+								if((joy1Btn(9)) && (joy1Btn(10))){
+
+									PlayTone(622,38);	wait10Msec(38);
+									PlayTone(784,15);	wait10Msec(19);
+									PlayTone(784,15);	wait10Msec(19);
+									PlayTone(784,15);	wait10Msec(19);
+									gyroloop = 0;
+								}
+					}}}//for the load of if statments
+		}}}
+
 
 		////////////////////////////////////////////////////////////////////////////////////
 		//                            End Gyro Mode Zone                                  //
 		////////////////////////////////////////////////////////////////////////////////////
 
-		nxtDisplayCenteredTextLine(1, "Gyro Mode Disabled");
+		nxtDisplayCenteredTextLine(1, "Gyro Disabled");
 		//driving bit
 		getJoystickSettings(joystick);
 		if(direction == "red"){
@@ -129,6 +142,7 @@ task main(){
 			motor[blue] = DZ((((joystick.joy1_y1)-(joystick.joy1_x1))/256.0)*100);
 			motor[green] = DZ(-(((joystick.joy1_y1)+(joystick.joy1_x1))/256.0)*100);
 			motor[red] = DZ((((joystick.joy1_x1)-(joystick.joy1_y1))/256.0)*100);
+
 			}else if(direction == "yellow"){
 			//default direction
 			motor[red] = DZ((((joystick.joy1_y1)+(joystick.joy1_x1))/256.0)*100);
@@ -141,6 +155,7 @@ task main(){
 			motor[red] = DZ((((joystick.joy1_y1)-(joystick.joy1_x1))/256.0)*100);
 			motor[yellow] = DZ(-(((joystick.joy1_y1)+(joystick.joy1_x1))/256.0)*100);
 			motor[blue] = DZ((((joystick.joy1_x1)-(joystick.joy1_y1))/256.0)*100);
+
 			}else if(direction == "green"){
 			motor[blue] = DZ((((joystick.joy1_y1)+(joystick.joy1_x1))/256.0)*100);
 			motor[green] = DZ((((joystick.joy1_y1)-(joystick.joy1_x1))/256.0)*100);
@@ -155,19 +170,23 @@ task main(){
 		motor[yellow] += DZ(((joystick.joy1_y2)/256.0)*100);
 
 		//lifter contrtols
+		//should be right back buttons
 		if(joy1Btn(8)){
 			motor[lift] = -100;
 			}else if(joy1Btn(6)){
 			motor[lift] = 100;
 			}else{
 			motor[lift] = 0;}
+
 		//flag spinner conrols
+		// top left back button
 		if(joy1Btn(5)){
 			motor[flag] = -100;
 			}else{
 			motor[flag] = 0;
 		}
 		//arm controls
+		//Top Hat up and down
 		if(joystick.joy1_TopHat == 4){
 			motor[arm] = -100;
 			servo[wrist] -= 1;
@@ -176,8 +195,10 @@ task main(){
 			servo[wrist] += 1;
 			}else{
 			motor[arm] = 0;}
+		//TODO: SET START AND END POSITIONS OF ARM AS HOTKEYS FOR POV L AND R
 
 		//wisk control
+		//left back lower button
 		if(joy1Btn(7)){
 			motor[whisk] = 100;
 			}else{
