@@ -20,15 +20,36 @@
 #pragma config(Servo,  srvo_S3_C1_5,    servo5,               tServoNone)
 #pragma config(Servo,  srvo_S3_C1_6,    servo6,               tServoNone)
 
+#include "JoystickDriver.c"
 
 
 task main()
 {
+	
+//auto block facing out
+
+servo[wrist] = 0;
+servo[autoflipper] = 250;
+waitForStart();
+
 //robot go forwards
 motor[red] = 60;
 motor[yellow] = -60; 
 motor[green] = 60;
 motor[blue] = -60;
+wait10Msec(150);
+
+motor[red] = -60;
+motor[yellow] = -60; 
+motor[green] = -60;
+motor[blue] = -60;
+wait10Msec(30);
+
+motor[red] = 100;
+motor[yellow] = -100; 
+motor[green] = 100;
+motor[blue] = -100;
+
 wait10Msec(150);
 //all stop
 motor[red] = 0;
