@@ -1,18 +1,16 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  none,     none)
+#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTMotor)
 #pragma config(Hubs,  S3, HTServo,  none,     none,     none)
-#pragma config(Hubs,  S4, HTMotor,  HTMotor,  none,     none)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     INF,            sensorHiTechnicIRSeeker1200)
-#pragma config(Sensor, S3,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S4,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S4,     RGB,            sensorCOLORFULL)
 #pragma config(Motor,  mtr_S1_C1_1,     yellow,        tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C1_2,     red,           tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     blue,          tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_2,     green,         tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S4_C1_1,     arm,           tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S4_C1_2,     whisk,         tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S4_C2_1,     lift,          tmotorTetrix, openLoop)
-#pragma config(Motor,  mtr_S4_C2_2,     flag,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_1,     arm,           tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_2,     whisk,         tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_1,     lift,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_2,     flag,          tmotorTetrix, openLoop)
 #pragma config(Servo,  srvo_S3_C1_1,    autoflipper,          tServoStandard)
 #pragma config(Servo,  srvo_S3_C1_2,    wrist,                tServoStandard)
 #pragma config(Servo,  srvo_S3_C1_3,    servo3,               tServoNone)
@@ -23,7 +21,9 @@
 
 #include "JoystickDriver.c"
 
+
 void driveToInf(){
+
 	int a = 5;
 	int ex = 0;
 	nMotorEncoder[yellow] = 0;
@@ -35,10 +35,10 @@ void driveToInf(){
 		if(nMotorEncoder[yellow] < 1000){
 			a = 5;
 			ex = 350;
-		}else if(nMotorEncoder[yellow] < 2000){
+			}else if(nMotorEncoder[yellow] < 2000){
 			a = 5;
 			ex = 350;
-		}else{
+			}else{
 			a = 5;
 			ex = 50;
 		}
@@ -75,6 +75,25 @@ void returnto(){
 
 
 task main (){
+	SensorType[RGB] = sensorCOLORFULL;
+	int waitstart = 0;
+	while(waitstart  == 0){
+		nxtDisplayCenteredTextLine(3, "<- Test Tournament ->");
+		if(nNxtButtonPressed == 2){
+			//test
+			wait1Msec(10);
+		};
+		
+		if(nNxtButtonPressed == 2){
+			//tournament
+			SensorType[RGB] = sensorCOLORFULL;
+			waitForStart();
+		};
+	};
+	SensorType[RGB] = sensorCOLORBLUE;
+
+
+
 	servo[wrist] = 0;
 	servo[autoflipper] = 240;
 	waitForStart();
