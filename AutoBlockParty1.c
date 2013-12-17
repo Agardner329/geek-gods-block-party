@@ -27,12 +27,28 @@ void driveToInf(){
 	int a = 5;
 	int ex = 0;
 	nMotorEncoder[yellow] = 0;
-	while(nMotorEncoder[yellow] < 5000){
+	while(SensorValue[INF] != a && nMotorEncoder[yellow] < 6500){
 		motor(red) = -80;
 		motor(yellow) = 60;
 		motor(green) = -80;
 		motor(blue) = 60;
+		if(nMotorEncoder[yellow] < 1000){
+			a = 5;
+			ex = 350;
+		}else if(nMotorEncoder[yellow] < 2000){
+			a = 5;
+			ex = 350;
+		}else{
+			a = 5;
+			ex = 50;
+		}
 	}
+
+	motor(red) = -60;
+	motor(yellow) = 60;
+	motor(green) = -60;
+	motor(blue) = 60;
+	wait1Msec(ex);
 	motor(blue) = 0;
 	motor(green) = 0;
 	motor(yellow) = 0;
@@ -59,8 +75,11 @@ void returnto(){
 
 
 task main (){
+	servo[wrist] = 0;
+	servo[autoflipper] = 240;
 	waitForStart();
 	driveToInf();
+	returnto();
 
 
 }
