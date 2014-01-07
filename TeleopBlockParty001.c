@@ -92,29 +92,29 @@ task autoflip(){
 
 			getJoystickSettings(joystick);
 			if(direction == "red"){
-				motor[yellow] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+				motor[red] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+				motor[green] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
+				motor[blue] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+				motor[yellow] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
+
+			}else if(direction == "green"){
+				//default direction
+				motor[green] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[blue] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[green] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+				motor[yellow] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[red] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 
-				}else if(direction == "yellow"){
-				//default direction
-				motor[red] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			}else if(direction == "blue"){
+				motor[blue] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[yellow] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[blue] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+				motor[red] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[green] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 
-				}else if(direction == "blue"){
-				motor[green] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			}else if(direction == "yellow"){
+				motor[yellow] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[red] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[yellow] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+				motor[green] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[blue] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
-
-				}else if(direction == "green"){
-				motor[blue] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[green] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[red] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[yellow] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 			}
 		}
 	}
@@ -172,9 +172,9 @@ task autoflip(){
 				//even though it says 8
 				servo[wrist] = 0;
 				wait10Msec(50);
-				while(nMotorEncoder[arm] > 10 && joystick.joy2_TopHat == -1 && joystick.joy1_TopHat == -1){
+				while(nMotorEncoder[arm] > 10 && joystick.joy2_TopHat == -1){
 					motor[arm] = -30;
-					motor[whisk] = 10;
+					motor[whisk] = 20;
 				}
 				motor[arm] = 0;
 				servo[wrist] = 123;
@@ -184,9 +184,9 @@ task autoflip(){
 				//enev though it says 9
 				servo[wrist] = 0;
 				wait10Msec(70);
-				while(nMotorEncoder[arm] < 4753 && joystick.joy2_TopHat == -1 && joystick.joy1_TopHat == -1){
+				while(nMotorEncoder[arm] < 4753 && joystick.joy2_TopHat == -1){
 					motor[arm] = 30;
-					motor[whisk] = 10;
+					motor[whisk] = 20;
 					if(nMotorEncoder[arm] > 1000){
 						servo[wrist] += 1;
 						wait1Msec(5);
@@ -217,7 +217,7 @@ task autoflip(){
 			abortTimeslice();
 		}
 	}
-	
+
 	task blinker(){
 		while(true){
 		SensorType[RGB] = sensorCOLORGREEN;
@@ -226,7 +226,7 @@ task autoflip(){
 		wait10Msec(50);
 	}
 }
-	
+
 	task main(){
 
 		SensorType[RGB] = sensorCOLORGREEN;
@@ -246,9 +246,9 @@ task autoflip(){
 		StartTask(flagger);
 
 		StartTask(whisker);
-		
+
 		StartTask(autoflip);
-		
+
 		StartTask(blinker);
 		while(true){
 			nxtDisplayTextLine(1,"%f",servo[wrist]);
