@@ -43,21 +43,23 @@ task main ()
 
     // Read rotation speed
     rotSpeed = HTGYROreadRot(HTGYRO);
-    
+
     /* Calculate the new heading by adding the amount of degrees
      we've turned in the last 20ms
      If our current rate of rotation is 100 degrees/second,
      then we will have turned 100 * (20/1000) = 2 degrees since
      the last time we measured.*/
-     
+
      //varience compinsator for integration with multiple tasks
-    heading += rotSpeed * (time1[T1]);
-    
+    nxtDisplayCenteredTextLine(2, "Timer: %2.3f", (time1[T1]));
+    heading += rotSpeed * (time1[T1] / 1000.0);
+
     // Reset timer
     time1[T1]=0;
 
     // Display degrees from start position
-    nxtDisplayCenteredTextLine(3, "Gyro: %2.3f", heading);
+
+    nxtDisplayCenteredTextLine(3, "GHead: %2.3f", heading);
   }
 }
 /*----------------------------------------End Gyro Position Compensation------------------------------*/
