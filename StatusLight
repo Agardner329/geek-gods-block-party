@@ -1,0 +1,47 @@
+#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTMotor)
+#pragma config(Hubs,  S3, HTServo,  none,     none,     none)
+#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S2,     INF,            sensorHiTechnicIRSeeker1200)
+#pragma config(Sensor, S3,     ,               sensorI2CMuxController)
+#pragma config(Sensor, S4,     RGB,            sensorCOLORFULL)
+#pragma config(Motor,  mtr_S1_C1_1,     yellow,        tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C1_2,     red,           tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     blue,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     green,         tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_1,     arm,           tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C3_2,     whisk,         tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_1,     lift,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_2,     flag,          tmotorTetrix, openLoop)
+#pragma config(Servo,  srvo_S3_C1_1,    autoflipper,          tServoStandard)
+#pragma config(Servo,  srvo_S3_C1_2,    wrist,                tServoStandard)
+#pragma config(Servo,  srvo_S3_C1_3,    servo3,               tServoNone)
+#pragma config(Servo,  srvo_S3_C1_4,    servo4,               tServoNone)
+#pragma config(Servo,  srvo_S3_C1_5,    servo5,               tServoNone)
+#pragma config(Servo,  srvo_S3_C1_6,    servo6,               tServoNone)
+
+//StatusLight.c
+//Include this in revelent programs
+// Use #include "StatusLight.c"
+int color = red;
+long nNoMessageCounterLimit = 250;
+
+task main(){
+	while(true){
+
+		if bool bDisconnected = true { color = red
+		}
+
+		if (color) == (red){
+			SensorType[RGB] = sensorCOLORRED;
+				}else if{ (color) == (green){
+				SensorType[RGB] = sensorCOLORGREEN;
+					}else if{ (color) == (blue){
+					SensorType[RGB] = sensorCOLORBLUE;
+						}else if{ (color) == (all){
+						SensorType[RGB] = sensorCOLORALL;
+					}
+					wait10Msec(50);
+					SensorType[RGB] = sensorCOLORNONE;
+					wait10Msec(50);
+				}
+			}
