@@ -3,7 +3,7 @@
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
 #pragma config(Sensor, S2,     INF,            sensorHiTechnicIRSeeker1200)
 #pragma config(Sensor, S3,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S4,     RGB,            sensorCOLORFULL)
+#pragma config(Sensor, S4,     RGB,            sensorCOLORGREEN)
 #pragma config(Motor,  mtr_S1_C1_1,     yellow,        tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     red,           tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     blue,          tmotorTetrix, openLoop)
@@ -23,6 +23,7 @@
 // teleopblockparty001.c
 
 #include "JoystickDriver.c";
+#include "statuslight.c";
 string direction = "yellow";
 void initializeRobot(){
 	nNoMessageCounterLimit = 100;
@@ -38,7 +39,7 @@ float DZ(float input){
 	}
 }
 
-
+int whiskeeeee = 0;
 task autoflip(){
 	int switcha = 0;
 	int switchb = 1;
@@ -48,11 +49,11 @@ task autoflip(){
 	servo[autoflipper] = 240;
 	while(true){
 		if((joy2Btn(1)) && (switcha == 0)){
-  		switcha = 1;
+			switcha = 1;
 		}
 		if((joy2Btn(1) != true) && (switcha == 1)){
-		 	switcha = 0;
-		  switchb *= -1;
+			switcha = 0;
+			switchb *= -1;
 		}
 		if(switchb == 1){
 			servo[autoflipper] = 240;
@@ -64,196 +65,201 @@ task autoflip(){
 }
 
 
-	task directionCont(){
-		while(true){
-			getJoystickSettings(joystick);
-			if(joy1Btn(1)){
-				direction = "blue";
-				}else if(joy1Btn(2)){
-				direction = "yellow";
-				}else if(joy1Btn(3)){
-				direction = "red";
-				}else if(joy1Btn(4)){
-				direction = "green";
-			}
-			abortTimeslice();
+task directionCont(){
+	while(true){
+		getJoystickSettings(joystick);
+		if(joy1Btn(1)){
+			direction = "blue";
+			}else if(joy1Btn(2)){
+			direction = "yellow";
+			}else if(joy1Btn(3)){
+			direction = "red";
+			}else if(joy1Btn(4)){
+			direction = "green";
 		}
+		abortTimeslice();
 	}
-	task drive(){
-		int turn;
-		while(true){
-			if(joystick.joy1_TopHat == 2){
-				turn = 100;
-				}else if(joystick.joy1_TopHat == 6){
-				turn = -100;
-				}else{
-				turn = 0;
-			}
+}
+task drive(){
+	int turn;
+	while(true){
+		if(joystick.joy1_TopHat == 2){
+			turn = 100;
+			}else if(joystick.joy1_TopHat == 6){
+			turn = -100;
+			}else{
+			turn = 0;
+		}
 
-			getJoystickSettings(joystick);
-			if(direction == "red"){
-				motor[red] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[green] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[blue] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[yellow] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
+		getJoystickSettings(joystick);
+		if(direction == "red"){
+			motor[red] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[green] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[blue] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[yellow] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 
 			}else if(direction == "green"){
-				//default direction
-				motor[green] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[blue] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[yellow] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[red] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
+			//default direction
+			motor[green] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[blue] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[yellow] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[red] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 
 			}else if(direction == "blue"){
-				motor[blue] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[yellow] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[red] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[green] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
+			motor[blue] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[yellow] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[red] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[green] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 
 			}else if(direction == "yellow"){
-				motor[yellow] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[red] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[green] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
-				motor[blue] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
-			}
+			motor[yellow] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[red] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[green] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
+			motor[blue] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 		}
 	}
-	task lifter(){
-		while(true){
-			if(joy1Btn(8)){
-				motor[lift] = -100;
-				}else if(joy1Btn(6)){
-				motor[lift] = 100;
-				}else if(joy2Btn(8)){
-				motor[lift] = -100;
-				}else if(joy2Btn(6)){
-				motor[lift] = 100;
-				}else{
-				motor[lift] = 0;
-			}
-			abortTimeslice();
+}
+task lifter(){
+	while(true){
+		if(joy1Btn(8)){
+			motor[lift] = -100;
+			}else if(joy1Btn(6)){
+			motor[lift] = 100;
+			}else if(joy2Btn(8)){
+			motor[lift] = -100;
+			}else if(joy2Btn(6)){
+			motor[lift] = 100;
+			}else{
+			motor[lift] = 0;
 		}
+		abortTimeslice();
 	}
-	task flagger(){
-		while(true){
-			if(joy1Btn(5)){
-				motor[flag] = 100;
-				}else if(joy2Btn(5)){
-				motor[flag] = 100;
-				}else{
-				motor[flag] = 0;
-			}
-			abortTimeslice();
+}
+task flagger(){
+	while(true){
+		if(joy1Btn(5)){
+			motor[flag] = 100;
+			}else if(joy2Btn(5)){
+			motor[flag] = 100;
+			}else{
+			motor[flag] = 0;
 		}
+		abortTimeslice();
 	}
-	task armer(){
-		while(true){
-			if(joystick.joy1_TopHat == 4){
-				motor[arm] = -60;
-				}else if(joystick.joy1_TopHat == 0){
-				motor[arm] = 60;
-				}else if(joystick.joy2_TopHat == 0){
-				motor[arm] = 60;
-				}else if(joystick.joy2_TopHat == 4){
-				motor[arm] = -60;
-				}else{
-				motor[arm] = 0;
-			}
+}
+task armer(){
+	while(true){
+		if(joystick.joy1_TopHat == 4){
+			motor[arm] = -60;
+			}else if(joystick.joy1_TopHat == 0){
+			motor[arm] = 60;
+			}else if(joystick.joy2_TopHat == 0){
+			motor[arm] = 60;
+			}else if(joystick.joy2_TopHat == 4){
+			motor[arm] = -60;
+			}else{
+			motor[arm] = 0;
+		}
 
-			if(DZ(joystick.joy1_y2) > 15){
-				servo[wrist] -= ((DZ(joystick.joy1_y2))/100);
+		if(DZ(joystick.joy1_y2) > 15){
+			servo[wrist] -= ((DZ(joystick.joy1_y2))/100);
 			}else if(DZ(joystick.joy1_y2) < -15){
-				servo[wrist] -= ((DZ(joystick.joy1_y2))/100);
+			servo[wrist] -= ((DZ(joystick.joy1_y2))/100);
 			}else if(DZ(joystick.joy2_y2) > 15){
-				servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
+			servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
 			}else if(DZ(joystick.joy2_y2) < -15){
-				servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
+			servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
 			}else if(joy2Btn(9)){
-				//even though it says 8
-				servo[wrist] = 0;
-				wait10Msec(50);
-				while(nMotorEncoder[arm] > 10 && joystick.joy2_TopHat == -1){
-					motor[arm] = -30;
-					motor[whisk] = 20;
-				}
-				motor[arm] = 0;
-				servo[wrist] = 123;
-				motor[whisk] = 0;
-
-				}else if(joy2Btn(10)){
-				//enev though it says 9
-				servo[wrist] = 0;
-				wait10Msec(70);
-				while(nMotorEncoder[arm] < 4753 && joystick.joy2_TopHat == -1){
-					motor[arm] = 30;
-					motor[whisk] = 20;
-					if(nMotorEncoder[arm] > 1000){
-						servo[wrist] += 1;
-						wait1Msec(5);
-					}
-				}
-				motor[arm] = 0;
-				servo[wrist] = 177;
-				motor[whisk] = 0;
-
-
-				}else if(joy2Btn(10)){
-				servo[wrist] = 0;
-				}else if(joy2Btn(9)){
-				servo[wrist] = 193;
+			whiskeeeee = 1;
+			//even though it says 8
+			servo[wrist] = 0;
+			wait10Msec(50);
+			while(nMotorEncoder[arm] > 10 && joystick.joy2_TopHat == -1){
+				motor[arm] = -30;
+				motor[whisk] = 20;
 			}
-			abortTimeslice();
-		}
+			motor[arm] = 0;
+			servo[wrist] = 123;
+			wait10Msec(100);
+			motor[whisk] = 0;
+			whiskeeeee = 0;
+			}else if(joy2Btn(10)){
+				whiskeeeee = 1;
+			//enev though it says 9
+			servo[wrist] = 0;
+			wait10Msec(70);
+			while(nMotorEncoder[arm] < 4753 && joystick.joy2_TopHat == -1){
+				motor[arm] = 30;
+				motor[whisk] = 20;
+				if(nMotorEncoder[arm] > 1000){
+					servo[wrist] += 1;
+					wait1Msec(5);
+				}
+			}
+			motor[arm] = 0;
+			servo[wrist] = 177;
+			motor[whisk] = 0;
+			whiskeeeee = 0;
+
+
+			}
+		abortTimeslice();
 	}
-	task whisker(){
-		while(true){
+}
+task whisker(){
+	while(true){
+		if(whiskeeeee == 0){
 			if(joy1Btn(7)){
 				motor[whisk] = 100;
-				}else if(joy2Btn(7)){
+			}else if(joy2Btn(7)){
 				motor[whisk] = 100;
-				}else{
+			}else{
 				motor[whisk] = 0;
 			}
-			abortTimeslice();
 		}
-	}
-
-	task blinker(){
-		while(true){
-		SensorType[RGB] = sensorCOLORGREEN;
-		wait10Msec(50);
-		SensorType[RGB] = sensorCOLORNONE;
-		wait10Msec(50);
+		abortTimeslice();
 	}
 }
 
-	task main(){
+task lightcolor(){
+color1 = "green";
+color2 = "none";
+while(true){
+	if (bDisconnected == true){
+		color2 = "red";
+}
+}
+}
 
-		SensorType[RGB] = sensorCOLORGREEN;
-		initializeRobot();
-		nMotorEncoder[arm] = 0;
-		servo[wrist] = 0;
-		// make freaking sure the arm is down
-		waitForStart();
-		StartTask(directionCont);
+task main(){
 
-		StartTask(drive);
+	SensorType[RGB] = sensorCOLORGREEN;
+	initializeRobot();
+	nMotorEncoder[arm] = 0;
+	servo[wrist] = 0;
+	// make freaking sure the arm is down
+	waitForStart();
+	StartTask(directionCont);
 
-		StartTask(lifter);
+	StartTask(drive);
 
-		StartTask(armer);
+	StartTask(lifter);
 
-		StartTask(flagger);
+	StartTask(armer);
 
-		StartTask(whisker);
+	StartTask(flagger);
 
-		StartTask(autoflip);
+	StartTask(whisker);
 
-		StartTask(blinker);
-		while(true){
-			nxtDisplayTextLine(1,"%f",servo[wrist]);
-			nxtDisplayTextLine(2,"%f",nMotorEncoder[arm]);
-		}
+	StartTask(autoflip);
+
+	StartTask(blinker);
+
+	StartTask(lightcolor);
+	while(true){
+		nxtDisplayTextLine(1,"%f",servo[wrist]);
+		nxtDisplayTextLine(2,"%f",nMotorEncoder[arm]);
 	}
-	//verticle servo: 177 encoder: 4753
-	//123 is for scooping [servo] 0 encoder
+}
+//verticle servo: 177 encoder: 4753
+//123 is for scooping [servo] 0 encoder
