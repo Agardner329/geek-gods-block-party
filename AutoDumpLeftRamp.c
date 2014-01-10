@@ -109,12 +109,39 @@ task main (){
                         SensorType[RGB] = sensorCOLORBLUE;
 
                         waitForStart();
+
+                        StartTask(blinker);
                 }
         }
 
-        StartTask(blinker);
 
-        driveToInf();
-        returnto();
+
+        motor(red) = -50;
+        motor(yellow) = -50;
+        motor(green) = 50;
+        motor(blue) = 50;
+        wait1Msec(500);
+        motor(red) = 0;
+        motor(yellow) = 0;
+        motor(blue) = 0;
+        motor(green) = 0;
+        servo[autoflipper] = 65;
+        wait1Msec(2500);
+        servo[autoflipper] = 240;
+        PlayTone(300,15);
+        motor(red) = -60;
+        motor(yellow) = 50;
+        motor(green) = -50;
+        motor(blue) = 60;
+        wait1Msec(1500);
+        motor(red) = -50;
+        motor(yellow) = -50;
+        motor(green) = 60;
+        motor(blue) = 60;
+        wait1Msec(2500);
+        motor(red) = 0;
+        motor(yellow) = 0;
+        motor(blue) = 0;
+        motor(green) = 0;
 
 }
