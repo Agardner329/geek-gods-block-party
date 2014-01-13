@@ -184,7 +184,7 @@ task armer(){
 			motor[whisk] = 0;
 			whiskeeeee = 0;
 			}else if(joy2Btn(10)){
-				whiskeeeee = 1;
+			whiskeeeee = 1;
 			//enev though it says 9
 			servo[wrist] = 0;
 			wait10Msec(70);
@@ -202,7 +202,7 @@ task armer(){
 			whiskeeeee = 0;
 
 
-			}
+		}
 		abortTimeslice();
 	}
 }
@@ -211,9 +211,9 @@ task whisker(){
 		if(whiskeeeee == 0){
 			if(joy1Btn(7)){
 				motor[whisk] = 100;
-			}else if(joy2Btn(7)){
+				}else if(joy2Btn(7)){
 				motor[whisk] = 100;
-			}else{
+				}else{
 				motor[whisk] = 0;
 			}
 		}
@@ -222,13 +222,15 @@ task whisker(){
 }
 
 task lightcolor(){
-color1 = "green";
-color2 = "none";
-while(true){
-	if (bDisconnected == true){
-		color2 = "red";
-}
-}
+	color1 = "green";
+	color2 = "none";
+	while(true){
+		if (bDisconnected == true){
+			color2 = "red";
+			}else{
+			color2 = "none";
+		}
+	}
 }
 
 task main(){
