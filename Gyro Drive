@@ -1,9 +1,7 @@
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTMotor)
 #pragma config(Hubs,  S3, HTServo,  none,     none,     none)
-#pragma config(Sensor, S1,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S2,     INF,            sensorHiTechnicIRSeeker1200)
-#pragma config(Sensor, S3,     ,               sensorI2CMuxController)
-#pragma config(Sensor, S4,     HTGYRO,              sensorAnalogInactive)
+#pragma config(Sensor, S2,     HTSMUX,              sensorI2CCustom)
+#pragma config(Sensor, S4,     RGB,            sensorCOLORFULL)
 #pragma config(Motor,  mtr_S1_C1_1,     yellow,        tmotorTetrix, openLoop, encoder)
 #pragma config(Motor,  mtr_S1_C1_2,     red,           tmotorTetrix, openLoop)
 #pragma config(Motor,  mtr_S1_C2_1,     blue,          tmotorTetrix, openLoop)
@@ -22,11 +20,28 @@
 
 // gyrodrive.c
 
-//NOTE: color and gyro are switched
+//the SMUX is plugged into PORT 2
+//   the gyro is in port 1 of the SMUX
+//   the ir is in port 3 of the SMUX
 
 #include "JoystickDriver.c";
 #include "statuslight.c";
-#include "drivers/hitechnic-gyro.h"
+#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-sensormux.h"
+//regular driver
+//#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\hitechnic-gyro.h"
+
+#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-gyro.h"    //for gyro sensor
+//#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\LEGOUS-driver.h"    //for sonar sensor
+#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-irseeker-v2.h"    //for IR seeker sensor
+//#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\LEGOTS-driver.h"    //for touch sensor
+
+//!!SMUX is connected to port 2 on NXT; gyro is in port 1 on smux and ir is in port 3!!//
+#define gyroSensor              msensor_S2_1
+//#define sonarSensor             msensor_S4_2
+#define irSensor          msensor_S2_3
+//#define touchSensor             msensor_S4_4
+
+int gyroloop = 0;
 string direction = "yellow";
 void initializeRobot(){
 	nNoMessageCounterLimit = 100;
@@ -84,7 +99,7 @@ task directionCont(){
 	}
 }
 task drive(){
-	if (gyroloop = 0){
+	if (gyroloop == 0){
 		int turn;
 		while(true){
 			if(joystick.joy1_TopHat == 2){
@@ -148,7 +163,7 @@ task gyrodrive(){
 				float heading = 0;
 
 				// Calibrating
-				HTGYROstartCal(HTGYRO);
+				HTGYROstartCal(gyroSensor);
 
 				// Reset the timer.
 				time1[T1] = 0;
@@ -160,7 +175,7 @@ task gyrodrive(){
 						wait1Msec(1);
 
 					// Read rotation speed
-					rotSpeed = HTGYROreadRot(HTGYRO);
+					rotSpeed = HTGYROreadRot(gyroSensor);
 
 					/* Calculate the new heading by adding the amount of degrees
 					we've turned in the last 20ms
@@ -217,7 +232,6 @@ task gyrodrive(){
 ////////////////////////////////////////////////////////////////////////////////////
 //                            End Gyro Mode Zone                                  //
 ////////////////////////////////////////////////////////////////////////////////////
-}
 
 
 
