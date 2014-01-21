@@ -5,6 +5,7 @@
 string color1 = "red";
 string color2 = "none";
 
+//this will show 'color1' for .5 sec then 'color2' and so on.
 task blinker(){
 	while(true){
 		if (color1 == "red"){
