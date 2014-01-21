@@ -1,7 +1,7 @@
 
-//StatusLight.c
+//statuslight.c
 //Include this in revelent programs
-// Use #include "StatusLight.c"
+// Use #include "statuslight.c"
 string color1 = "red";
 string color2 = "none";
 
