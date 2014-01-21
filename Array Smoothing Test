@@ -1,0 +1,60 @@
+#pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTMotor)
+#pragma config(Hubs,  S3, HTServo,  none,     none,     none)
+#pragma config(Sensor, S2,     HTSMUX,              sensorI2CCustom)
+#pragma config(Sensor, S4,     RGB,            sensorCOLORFULL)
+#pragma config(Motor,  mtr_S1_C1_1,     yellow,        tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C1_2,     red,           tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_1,     blue,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C2_2,     green,         tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C3_1,     arm,           tmotorTetrix, openLoop, encoder)
+#pragma config(Motor,  mtr_S1_C3_2,     whisk,         tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_1,     lift,          tmotorTetrix, openLoop)
+#pragma config(Motor,  mtr_S1_C4_2,     flag,          tmotorTetrix, openLoop)
+#pragma config(Servo,  srvo_S3_C1_1,    autoflipper,          tServoStandard)
+#pragma config(Servo,  srvo_S3_C1_2,    wrist,                tServoStandard)
+#pragma config(Servo,  srvo_S3_C1_3,    servo3,               tServoNone)
+#pragma config(Servo,  srvo_S3_C1_4,    servo4,               tServoNone)
+#pragma config(Servo,  srvo_S3_C1_5,    servo5,               tServoNone)
+#pragma config(Servo,  srvo_S3_C1_6,    servo6,               tServoNone)
+
+#include "JoystickDriver.c"
+
+//arm_control.c
+float DZ(float input){
+	if(input > -10 && input < 10){
+		return 0;
+		}else{
+		return input;
+	}
+}
+
+task main(){
+	while(true){
+		//arm
+
+		float values[10];
+
+for(int i = 0; i < 10; i++){
+  values[i] = ((joystick.joy2_y1)/128);
+		time10[T2] = 0;
+		while (time10[T2] < 100)
+			wait1Msec(1);
+	
+		float smoothed_array = ((i[0]+i[1]+i[2]+i[3]+i[4]+i[5]+i[6]+i[7]+i[8]+i[9])/10);
+		motor[arm] = (smoothed_array);
+}
+		
+
+
+
+
+
+	}
+	//wrist
+	if(DZ(joystick.joy2_y2) > 15){
+		servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
+		}else if(DZ(joystick.joy2_y2) < -15){
+		servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
+
+	}
+}
