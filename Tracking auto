@@ -60,7 +60,7 @@ void driveToInf(){
 				secondsight = nMotorEncoder[yellow];
 			}
 		}
-		while(nMotorEncoder[yellow] > ((firstsight + secondsight)/2.0)){
+		while(nMotorEncoder[yellow] > ((secondsight - firstsight)/2.0)){
 
 
 			int ex = 0;
