@@ -36,9 +36,9 @@
 //#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\LEGOTS-driver.h"    //for touch sensor
 
 //!!SMUX is connected to port 2 on NXT; gyro is in port 1 on smux and ir is in port 3!!//
-#define gyroSensor              msensor_S2_1
+#define HTGYRO              msensor_S2_1
 //#define sonarSensor             msensor_S4_2
-#define irSensor          msensor_S2_3
+#define INF          msensor_S2_3
 //#define touchSensor             msensor_S4_4
 
 int gyroloop = 0;
@@ -158,12 +158,12 @@ task gyrodrive(){
 				PlayTone(784,15);	wait10Msec(19);
 				PlayTone(622,38);	wait10Msec(38);
 				gyroloop = 1;
-				//Gyro goes in port 4
+
 				float rotSpeed = 0;
 				float heading = 0;
 
 				// Calibrating
-				HTGYROstartCal(gyroSensor);
+				HTGYROstartCal(HTGYRO);
 
 				// Reset the timer.
 				time1[T1] = 0;
@@ -175,7 +175,7 @@ task gyrodrive(){
 						wait1Msec(1);
 
 					// Read rotation speed
-					rotSpeed = HTGYROreadRot(gyroSensor);
+					rotSpeed = HTGYROreadRot(HTGYRO);
 
 					/* Calculate the new heading by adding the amount of degrees
 					we've turned in the last 20ms
@@ -340,11 +340,17 @@ while(true){
 task lightcolor(){
 color1 = "green";
 color2 = "none";
+int didloosecon = 0;
 while(true){
 	if (bDisconnected == true){
 		color2 = "red";
+		didloosecon = 1;
 		}else{
 		color2 = "none";
+	}
+	if (didloosecon == 1 && bDisconnected == false){
+		color2 = "green";
+		didloosecon = 0;
 	}
 }
 }
