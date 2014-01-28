@@ -21,7 +21,7 @@
 //tracking auto.c
 
 //the SMUX is plugged into PORT 2
-//   the gyro is in port 1 of the SMUX
+//   the gyro is in port 4 of the SMUX
 //   the ir is in port 3 of the SMUX
 
 #include "JoystickDriver.c";
@@ -36,7 +36,7 @@
 //#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\LEGOTS-driver.h"    //for touch sensor
 
 //!!SMUX is connected to port 2 on NXT; gyro is in port 1 on smux and ir is in port 3!!//
-#define HTGYRO              msensor_S2_1
+#define HTGYRO              msensor_S2_4
 //#define sonarSensor             msensor_S4_2
 #define INF          msensor_S2_3
 //#define touchSensor             msensor_S4_4
