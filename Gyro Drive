@@ -141,25 +141,24 @@ task drive(){
 	}
 }
 
+
 task gyrodrive(){
 	////////////////////////////////////////////////////////////////////////////////////
 	//                                Gyro Mode Zone                                  //
 	////////////////////////////////////////////////////////////////////////////////////
 
 	//enter gyro mode
-	// Hold down both buttons 9 and 10 (should be middle buttons)
+	// Hold down both buttons 9 and 10 (should be middle buttons) BE SURE ROBOT IS FACING AWAY FROM YOU.
 	while(true){
 		if((joy1Btn(9)) && (joy1Btn(10))){
-			wait10Msec(50);
-			if((joy1Btn(9)) && (joy1Btn(10))){
-				wait10Msec(50);
-				if(((joy1Btn(9)) && (joy1Btn(10)))){
 					PlayTone(784,15);	wait10Msec(19);
 					PlayTone(784,15);	wait10Msec(19);
 					PlayTone(784,15);	wait10Msec(19);
 					PlayTone(622,38);	wait10Msec(38);
-					wait10Msec(200);
+					wait10Msec(200); //allow time for fingers to get off the keys
 					gyroloop = 1;
+					disableDiagnosticsDisplay();
+					nxtDisplayCenteredTextLine(3, "Gyro Enabled");
 
 					float rotSpeed = 0;
 					float heading = 0;
@@ -184,7 +183,7 @@ task gyrodrive(){
 						then we will have turned 100 * (20/1000) = 2 degrees since
 						the last time we measured.*/
 
-						//varience compinsator for integration with multiple tasks
+						//variance compensator for integration with multiple tasks
 						nxtDisplayCenteredTextLine(2, "Timer: %2.3f", (time1[T1]));
 						heading += rotSpeed * (time1[T1] / 1000.0);
 
@@ -192,7 +191,7 @@ task gyrodrive(){
 						time1[T1]=0;
 
 						// Display degrees from start position
-						disableDiagnosticsDisplay();
+
 						nxtDisplayCenteredTextLine(3, "Heading: %2.3f", heading);
 					}
 					//reset if over 360 degrees
@@ -213,26 +212,24 @@ task gyrodrive(){
 					motor(red) = X-Y+joystick.joy1_x2;
 					motor(yellow) = joystick.joy1_x2-X-Y;
 
-					//exit gyro mode
+					//exiting gyro mode
 					if((joy1Btn(9)) && (joy1Btn(10))){
-						wait10Msec(50);
-						if((joy1Btn(9)) && (joy1Btn(10))){
-							wait10Msec(50);
-							if((joy1Btn(9)) && (joy1Btn(10))){
 
 								PlayTone(622,38);	wait10Msec(38);
 								PlayTone(784,15);	wait10Msec(19);
 								PlayTone(784,15);	wait10Msec(19);
 								PlayTone(784,15);	wait10Msec(19);
 								gyroloop = 0;
-							}
-				}}}//for the load of if statments
-	}}}
+								nxtDisplayCenteredTextLine(3, "Gyro Disabled");
+							}//second button press
+				}//for first button press
+	}//close while true
 
-}
-////////////////////////////////////////////////////////////////////////////////////
-//                            End Gyro Mode Zone                                  //
-////////////////////////////////////////////////////////////////////////////////////
+}//close task
+
+	////////////////////////////////////////////////////////////////////////////////////
+	//                            End Gyro Mode Zone                                  //
+	////////////////////////////////////////////////////////////////////////////////////
 
 
 
