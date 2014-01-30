@@ -151,85 +151,85 @@ task gyrodrive(){
 	// Hold down both buttons 9 and 10 (should be middle buttons) BE SURE ROBOT IS FACING AWAY FROM YOU.
 	while(true){
 		if((joy1Btn(9)) && (joy1Btn(10))){
-					PlayTone(784,15);	wait10Msec(19);
-					PlayTone(784,15);	wait10Msec(19);
-					PlayTone(784,15);	wait10Msec(19);
-					PlayTone(622,38);	wait10Msec(38);
-					wait10Msec(200); //allow time for fingers to get off the keys
-					gyroloop = 1;
-					disableDiagnosticsDisplay();
-					nxtDisplayCenteredTextLine(3, "Gyro Enabled");
+			PlayTone(784,15);	wait10Msec(19);
+			PlayTone(784,15);	wait10Msec(19);
+			PlayTone(784,15);	wait10Msec(19);
+			PlayTone(622,38);	wait10Msec(38);
+			wait10Msec(200); //allow time for fingers to get off the keys
+			gyroloop = 1;
+			disableDiagnosticsDisplay();
+			nxtDisplayCenteredTextLine(3, "Gyro Enabled");
 
-					float rotSpeed = 0;
-					float heading = 0;
+			float rotSpeed = 0;
+			float heading = 0;
 
-					// Calibrating
-					HTGYROstartCal(HTGYRO);
+			// Calibrating
+			HTGYROstartCal(HTGYRO);
 
-					// Reset the timer.
-					time1[T1] = 0;
+			// Reset the timer.
+			time1[T1] = 0;
 
-					while (gyroloop == 1){
-						// timeout 20ms
-						while (time1[T1] < 20)
-							wait1Msec(1);
+			while (gyroloop == 1){
+				// timeout 20ms
+				while (time1[T1] < 20)
+					wait1Msec(1);
 
-						// Read rotation speed
-						rotSpeed = HTGYROreadRot(HTGYRO);
+				// Read rotation speed
+				rotSpeed = HTGYROreadRot(HTGYRO);
 
-						/* Calculate the new heading by adding the amount of degrees
-						we've turned in the last 20ms
-						If our current rate of rotation is 100 degrees/second,
-						then we will have turned 100 * (20/1000) = 2 degrees since
-						the last time we measured.*/
+				/* Calculate the new heading by adding the amount of degrees
+				we've turned in the last 20ms
+				If our current rate of rotation is 100 degrees/second,
+				then we will have turned 100 * (20/1000) = 2 degrees since
+				the last time we measured.*/
 
-						//variance compensator for integration with multiple tasks
-						nxtDisplayCenteredTextLine(2, "Timer: %2.3f", (time1[T1]));
-						heading += rotSpeed * (time1[T1] / 1000.0);
+				//variance compensator for integration with multiple tasks
+				nxtDisplayCenteredTextLine(2, "Timer: %2.3f", (time1[T1]));
+				heading += rotSpeed * (time1[T1] / 1000.0);
 
-						// Reset timer
-						time1[T1]=0;
+				// Reset timer
+				time1[T1]=0;
 
-						// Display degrees from start position
+				// Display degrees from start position
 
-						nxtDisplayCenteredTextLine(3, "Heading: %2.3f", heading);
-					}
-					//reset if over 360 degrees
-					if (heading >= 360){
-						heading = (heading - 360);
-					}
-					//reset if under 360
-					if (heading <= 0){
-						heading = (heading + 359);
-					}
-					//ultimate omni drive code:
-					getJoystickSettings(joystick);
-					long X = (joystick.joy1_x1*cos((heading*PI)/180)) + (joystick.joy1_y1*sin((heading*PI)/180));
-					long Y = (joystick.joy1_y1*cos((heading*PI)/180)) - (joystick.joy1_x1*sin((heading*PI)/180));
+				nxtDisplayCenteredTextLine(3, "Heading: %2.3f", heading);
+			}
+			//reset if over 360 degrees
+			if (heading >= 360){
+				heading = (heading - 360);
+			}
+			//reset if under 360
+			if (heading <= 0){
+				heading = (heading + 359);
+			}
+			//ultimate omni drive code:
+			getJoystickSettings(joystick);
+			long X = (joystick.joy1_x1*cos((heading*PI)/180)) + (joystick.joy1_y1*sin((heading*PI)/180));
+			long Y = (joystick.joy1_y1*cos((heading*PI)/180)) - (joystick.joy1_x1*sin((heading*PI)/180));
 
-					motor(blue) = X+Y+joystick.joy1_x2;
-					motor(green) = Y-X+joystick.joy1_x2;
-					motor(red) = X-Y+joystick.joy1_x2;
-					motor(yellow) = joystick.joy1_x2-X-Y;
+			motor(blue) = X+Y+joystick.joy1_x2;
+			motor(green) = Y-X+joystick.joy1_x2;
+			motor(red) = X-Y+joystick.joy1_x2;
+			motor(yellow) = joystick.joy1_x2-X-Y;
 
-					//exiting gyro mode
-					if((joy1Btn(9)) && (joy1Btn(10))){
+			//exiting gyro mode
+			if((joy1Btn(9)) && (joy1Btn(10))){
 
-								PlayTone(622,38);	wait10Msec(38);
-								PlayTone(784,15);	wait10Msec(19);
-								PlayTone(784,15);	wait10Msec(19);
-								PlayTone(784,15);	wait10Msec(19);
-								gyroloop = 0;
-								nxtDisplayCenteredTextLine(3, "Gyro Disabled");
-							}//second button press
-				}//for first button press
+				PlayTone(622,38);	wait10Msec(38);
+				PlayTone(784,15);	wait10Msec(19);
+				PlayTone(784,15);	wait10Msec(19);
+				PlayTone(784,15);	wait10Msec(19);
+				gyroloop = 0;
+				nxtDisplayCenteredTextLine(3, "Gyro Disabled");
+			}//second button press
+		}//for first button press
 	}//close while true
 
 }//close task
 
-	////////////////////////////////////////////////////////////////////////////////////
-	//                            End Gyro Mode Zone                                  //
-	////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+//                            End Gyro Mode Zone                                  //
+////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -262,28 +262,50 @@ task flagger(){
 	}
 }
 task armer(){
+	int number = 0;
+	float values[10] = {0,0,0,0,0,0,0,0,0,0};
 	while(true){
-		if(joystick.joy1_TopHat == 4){
-			motor[arm] = -60;
-			}else if(joystick.joy1_TopHat == 0){
-			motor[arm] = 60;
-			}else if(joystick.joy2_TopHat == 0){
-			motor[arm] = 60;
-			}else if(joystick.joy2_TopHat == 4){
-			motor[arm] = -60;
-			}else{
-			motor[arm] = 0;
+		getJoystickSettings(joystick);
+		if(number > 9){
+			number = 0;
 		}
 
-		if(DZ(joystick.joy1_y2) > 15){
-			servo[wrist] -= ((DZ(joystick.joy1_y2))/100);
-			}else if(DZ(joystick.joy1_y2) < -15){
-			servo[wrist] -= ((DZ(joystick.joy1_y2))/100);
-			}else if(DZ(joystick.joy2_y2) > 15){
-			servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
-			}else if(DZ(joystick.joy2_y2) < -15){
-			servo[wrist] -= ((DZ(joystick.joy2_y2))/100);
-			}else if(joy2Btn(9)){
+		values[number] = joystick.joy2_y1;
+
+		float smoothed_array = ((values[0]+values[1]+values[2]+values[3]+values[4]+values[5]+values[6]+values[7]+values[8]+values[9])/10);
+		disableDiagnosticsDisplay();
+		nxtDisplayBigTextLine(3,"%f",smoothed_array);
+		if(smoothed_array < 0){
+			if(nMotorEncoder[arm] < -10){
+				motor[arm] = 0;
+			}else{
+				if(nMotorEncoder[arm] > 9000){
+					if(smoothed_array > 0){
+						motor[arm] = 0;
+					}else{
+						motor[arm] = (DZ(smoothed_array)/2);
+					}
+				}else{
+					motor[arm] = (DZ(smoothed_array)/2);
+				}
+			}
+			}else{
+			if(nMotorEncoder[arm] > 9000){
+				if(smoothed_array > 0){
+						motor[arm] = 0;
+				}else{
+						motor[arm] = (DZ(smoothed_array)/2);
+					}
+			}else{
+					motor[arm] = (DZ(smoothed_array)/2);
+			}
+		}
+
+		number ++;
+		wait10Msec(3);
+		servo[wrist] -= ((DZ(joystick.joy2_y2))/20);
+
+		if(joy2Btn(9)){
 			whiskeeeee = 1;
 			//even though it says 8
 			servo[wrist] = 0;
@@ -385,5 +407,5 @@ task main(){
 		nxtDisplayTextLine(2,"%f",nMotorEncoder[arm]);
 	}
 }
-//verticle servo: 177 encoder: 4753
+//verticle servo: 177 encoder: 475362
 //123 is for scooping [servo] 0 encoder
