@@ -78,6 +78,7 @@ task autoflip(){
 		if(switchb == -1){
 			servo[autoflipper] = 0;
 		}
+		abortTimeslice();
 	}
 }
 
@@ -157,7 +158,7 @@ task gyrodrive(){
 			wait10Msec(200); //allow time for fingers to get off the keys
 			gyroloop = 1;
 			disableDiagnosticsDisplay();
-			nxtDisplayCenteredTextLine(3, "Gyro Enabled");
+			nxtDisplayCenteredTextLine(2, "Gyro Enabled");
 
 			float rotSpeed = 0;
 			float heading = 0;
@@ -183,7 +184,7 @@ task gyrodrive(){
 				the last time we measured.*/
 
 				//variance compensator for integration with multiple tasks
-				nxtDisplayCenteredTextLine(2, "Timer: %2.3f", (time1[T1]));
+				nxtDisplayCenteredTextLine(4, "Timer: %2.3f", (time1[T1]));
 				heading += rotSpeed * (time1[T1] / 1000.0);
 
 				// Reset timer
@@ -193,14 +194,15 @@ task gyrodrive(){
 
 				nxtDisplayCenteredTextLine(3, "Heading: %2.3f", heading);
 			}
-			//reset if over 360 degrees
+			//reset if over 360 degrees:
 			if (heading >= 360){
 				heading = (heading - 360);
 			}
-			//reset if under 360
-			if (heading <= 0){
-				heading = (heading + 359);
+			//reset if under 0:
+			if (heading <= -1){
+				heading = (heading + 360);
 			}
+
 			//ultimate omni drive code:
 			getJoystickSettings(joystick);
 			long X = (joystick.joy1_x1*cos((heading*PI)/180)) + (joystick.joy1_y1*sin((heading*PI)/180));
@@ -211,7 +213,7 @@ task gyrodrive(){
 			motor(red) = X-Y+joystick.joy1_x2;
 			motor(yellow) = joystick.joy1_x2-X-Y;
 
-			//exiting gyro mode
+			//exiting gyro mode:
 			if((joy1Btn(9)) && (joy1Btn(10))){
 
 				PlayTone(622,38);	wait10Msec(38);
@@ -219,11 +221,12 @@ task gyrodrive(){
 				PlayTone(784,15);	wait10Msec(19);
 				PlayTone(784,15);	wait10Msec(19);
 				gyroloop = 0;
-				nxtDisplayCenteredTextLine(3, "Gyro Disabled");
+
+				eraseDisplay();
+				bDisplayDiagnostics = true;
 			}//second button press
 		}//for first button press
 	}//close while true
-
 }//close task
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -261,6 +264,7 @@ task flagger(){
 	}
 }
 task armer(){
+	// Start Array Smoothing //
 	int number = 0;
 	float values[10] = {0,0,0,0,0,0,0,0,0,0};
 	while(true){
@@ -272,7 +276,6 @@ task armer(){
 		values[number] = joystick.joy2_y1;
 
 		float smoothed_array = ((values[0]+values[1]+values[2]+values[3]+values[4]+values[5]+values[6]+values[7]+values[8]+values[9])/10);
-		disableDiagnosticsDisplay();
 		if(smoothed_array < 0){
 			if(nMotorEncoder[arm] < -10){
 				motor[arm] = 0;
@@ -302,7 +305,9 @@ task armer(){
 		number ++;
 		wait10Msec(3);
 		servo[wrist] -= ((DZ(joystick.joy2_y2))/20);
+		// End Array Smoothing //
 
+		// Start Auto Buttons //
 		if(joy2Btn(9)){
 			whiskeeeee = 1;
 			//even though it says 8
@@ -334,7 +339,7 @@ task armer(){
 			servo[wrist] = 177;
 			motor[whisk] = 0;
 			whiskeeeee = 0;
-
+			// End Auto Buttons //
 
 		}
 		abortTimeslice();
