@@ -35,7 +35,6 @@
 #include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-irseeker-v2.h"    //for IR seeker sensor
 //#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\LEGOTS-driver.h"    //for touch sensor
 
-//!!SMUX is connected to port 2 on NXT; gyro is in port 1 on smux and ir is in port 3!!//
 #define HTGYRO              msensor_S2_4
 //#define sonarSensor             msensor_S4_2
 #define INF          msensor_S2_3
@@ -45,7 +44,6 @@ int gyroloop = 0;
 string direction = "yellow";
 void initializeRobot(){
 	nNoMessageCounterLimit = 100;
-	servo[autoflipper] = 20;
 	motor[arm] = 0;
 	return;
 }
@@ -58,6 +56,7 @@ float DZ(float input){
 }
 
 int whiskeeeee = 0;
+
 task autoflip(){
 	int switcha = 0;
 	int switchb = 1;
@@ -274,30 +273,29 @@ task armer(){
 
 		float smoothed_array = ((values[0]+values[1]+values[2]+values[3]+values[4]+values[5]+values[6]+values[7]+values[8]+values[9])/10);
 		disableDiagnosticsDisplay();
-		nxtDisplayBigTextLine(3,"%f",smoothed_array);
 		if(smoothed_array < 0){
 			if(nMotorEncoder[arm] < -10){
 				motor[arm] = 0;
-			}else{
+				}else{
 				if(nMotorEncoder[arm] > 9000){
 					if(smoothed_array > 0){
 						motor[arm] = 0;
-					}else{
+						}else{
 						motor[arm] = (DZ(smoothed_array)/2);
 					}
-				}else{
+					}else{
 					motor[arm] = (DZ(smoothed_array)/2);
 				}
 			}
 			}else{
 			if(nMotorEncoder[arm] > 9000){
 				if(smoothed_array > 0){
-						motor[arm] = 0;
-				}else{
-						motor[arm] = (DZ(smoothed_array)/2);
-					}
-			}else{
+					motor[arm] = 0;
+					}else{
 					motor[arm] = (DZ(smoothed_array)/2);
+				}
+				}else{
+				motor[arm] = (DZ(smoothed_array)/2);
 			}
 		}
 
