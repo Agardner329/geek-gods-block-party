@@ -193,7 +193,6 @@ task gyrodrive(){
 				// Display degrees from start position
 
 				nxtDisplayCenteredTextLine(3, "Heading: %2.3f", heading);
-			}
 			//reset if over 360 degrees:
 			if (heading >= 360){
 				heading = (heading - 360);
@@ -212,7 +211,7 @@ task gyrodrive(){
 			motor(green) = Y-X+joystick.joy1_x2;
 			motor(red) = X-Y+joystick.joy1_x2;
 			motor(yellow) = joystick.joy1_x2-X-Y;
-
+}
 			//exiting gyro mode:
 			if((joy1Btn(9)) && (joy1Btn(10))){
 
