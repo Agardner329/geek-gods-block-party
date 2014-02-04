@@ -41,6 +41,7 @@
 //#define touchSensor             msensor_S4_1
 
 int gyroloop = 0;
+float heading = 0;
 string direction = "yellow";
 void initializeRobot(){
 	nNoMessageCounterLimit = 100;
@@ -95,6 +96,11 @@ task directionCont(){
 			}else if(joy1Btn(4)){
 			direction = "green";
 		}
+		if (joy2Btn(3)){
+			// Calibrating
+			HTGYROstartCal(HTGYRO);
+			heading = 0;
+		}
 		abortTimeslice();
 	}
 }
@@ -138,6 +144,7 @@ task drive(){
 				motor[blue] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 			}
 		}
+		abortTimeslice();
 	}
 }
 
@@ -158,10 +165,11 @@ task gyrodrive(){
 			wait10Msec(200); //allow time for fingers to get off the keys
 			gyroloop = 1;
 			disableDiagnosticsDisplay();
+			eraseDisplay();
 			nxtDisplayCenteredTextLine(2, "Gyro Enabled");
 
 			float rotSpeed = 0;
-			float heading = 0;
+			heading = 0;
 
 			// Calibrating
 			HTGYROstartCal(HTGYRO);
@@ -171,7 +179,7 @@ task gyrodrive(){
 
 			while (gyroloop == 1){
 				// timeout 20ms
-				while (time1[T1] < 20)
+				while (time1[T1] < 10)
 					wait1Msec(1);
 
 				// Read rotation speed
@@ -182,10 +190,9 @@ task gyrodrive(){
 				If our current rate of rotation is 100 degrees/second,
 				then we will have turned 100 * (20/1000) = 2 degrees since
 				the last time we measured.*/
-
 				//variance compensator for integration with multiple tasks
-				nxtDisplayCenteredTextLine(4, "Timer: %2.3f", (time1[T1]));
 				heading += rotSpeed * (time1[T1] / 1000.0);
+				nxtDisplayCenteredTextLine(4, "Timer: %2.3f", (time1[T1]));
 
 				// Reset timer
 				time1[T1]=0;
@@ -193,36 +200,43 @@ task gyrodrive(){
 				// Display degrees from start position
 
 				nxtDisplayCenteredTextLine(3, "Heading: %2.3f", heading);
-			//reset if over 360 degrees:
-			if (heading >= 360){
-				heading = (heading - 360);
-			}
-			//reset if under 0:
-			if (heading <= -1){
-				heading = (heading + 360);
-			}
+				//reset if over 360 degrees:
+				if (heading >= 360){
+					heading = (heading - 360);
+				}
+				//reset if under 0:
+				if (heading <= -1){
+					heading = (heading + 360);
+				}
 
-			//ultimate omni drive code:
-			getJoystickSettings(joystick);
-			long X = (joystick.joy1_x1*cos((heading*PI)/180)) + (joystick.joy1_y1*sin((heading*PI)/180));
-			long Y = (joystick.joy1_y1*cos((heading*PI)/180)) - (joystick.joy1_x1*sin((heading*PI)/180));
+				//ultimate omni drive code:
+				getJoystickSettings(joystick);
 
-			motor(blue) = X+Y+joystick.joy1_x2;
-			motor(green) = Y-X+joystick.joy1_x2;
-			motor(red) = X-Y+joystick.joy1_x2;
-			motor(yellow) = joystick.joy1_x2-X-Y;
-}
-			//exiting gyro mode:
-			if((joy1Btn(9)) && (joy1Btn(10))){
+				long X = ((-joystick.joy1_x1)*cos((heading*PI)/180)) + ((-joystick.joy1_y1)*sin((heading*PI)/180));
+				long Y = ((-joystick.joy1_y1)*cos((heading*PI)/180)) - ((-joystick.joy1_x1)*sin((heading*PI)/180));
 
-				PlayTone(622,38);	wait10Msec(38);
-				PlayTone(784,15);	wait10Msec(19);
-				PlayTone(784,15);	wait10Msec(19);
-				PlayTone(784,15);	wait10Msec(19);
-				gyroloop = 0;
+				motor(green) = DZ(X+Y+joystick.joy1_x2);
+				motor(blue) = DZ(Y-X+joystick.joy1_x2);
+				motor(red) = DZ(X-Y+joystick.joy1_x2);
+				motor(yellow) = DZ(joystick.joy1_x2-X-Y);
 
-				eraseDisplay();
-				bDisplayDiagnostics = true;
+				if (joystick.joy1_TopHat == 4)
+					heading = 0;
+
+
+
+				//exiting gyro mode:
+				if((joy1Btn(9)) && (joy1Btn(10))){
+
+					PlayTone(622,38);	wait10Msec(38);
+					PlayTone(784,15);	wait10Msec(19);
+					PlayTone(784,15);	wait10Msec(19);
+					PlayTone(784,15);	wait10Msec(19);
+					gyroloop = 0;
+
+					eraseDisplay();
+					bDisplayDiagnostics = true;
+				}//end while
 			}//second button press
 		}//for first button press
 	}//close while true
@@ -351,7 +365,9 @@ task whisker(){
 				motor[whisk] = 100;
 				}else if(joy2Btn(7)){
 				motor[whisk] = 100;
-				}else{
+				}else if(joy2Btn(2)){
+				motor[whisk] = -50;
+			}else{
 				motor[whisk] = 0;
 			}
 		}
@@ -367,6 +383,11 @@ task lightcolor(){
 		if (bDisconnected == true){
 			color2 = "red";
 			didloosecon = 1;
+			motor[blue] = 0;
+			motor[yellow] = 0;
+			motor[green] = 0;
+			motor[red] = 0;
+			motor[arm] = 0;
 			}else{
 			color2 = "none";
 		}
@@ -374,6 +395,7 @@ task lightcolor(){
 			color2 = "green";
 			didloosecon = 0;
 		}
+		abortTimeslice();
 	}
 }
 
