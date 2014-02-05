@@ -96,11 +96,6 @@ task directionCont(){
 			}else if(joy1Btn(4)){
 			direction = "green";
 		}
-		if (joy2Btn(3)){
-			// Calibrating
-			HTGYROstartCal(HTGYRO);
-			heading = 0;
-		}
 		abortTimeslice();
 	}
 }
@@ -125,7 +120,6 @@ task drive(){
 				motor[yellow] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 
 				}else if(direction == "green"){
-				//default direction
 				motor[green] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[blue] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[yellow] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
@@ -138,6 +132,7 @@ task drive(){
 				motor[green] = (((DZ(joystick.joy1_x1)-DZ(joystick.joy1_y1))/128.0)*100) - turn;
 
 				}else if(direction == "yellow"){
+				//default direction
 				motor[yellow] = (((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[red] = (((DZ(joystick.joy1_y1)-DZ(joystick.joy1_x1))/128.0)*100) - turn;
 				motor[green] = -(((DZ(joystick.joy1_y1)+DZ(joystick.joy1_x1))/128.0)*100) - turn;
@@ -150,13 +145,18 @@ task drive(){
 
 
 task gyrodrive(){
-	////////////////////////////////////////////////////////////////////////////////////
-	//                                Gyro Mode Zone                                  //
-	////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+//                                Gyro Mode Zone                                  //
+////////////////////////////////////////////////////////////////////////////////////
 
 	//enter gyro mode
 	// Hold down both buttons 9 and 10 (should be middle buttons) BE SURE ROBOT IS FACING AWAY FROM YOU.
 	while(true){
+		if (joy2Btn(3)){
+			// Calibrating & reset
+			HTGYROstartCal(HTGYRO);
+			heading = 0;
+		}
 		if((joy1Btn(9)) && (joy1Btn(10))){
 			PlayTone(784,15);	wait10Msec(19);
 			PlayTone(784,15);	wait10Msec(19);
@@ -222,8 +222,6 @@ task gyrodrive(){
 
 				if (joystick.joy1_TopHat == 4)
 					heading = 0;
-
-
 
 				//exiting gyro mode:
 				if((joy1Btn(9)) && (joy1Btn(10))){
@@ -337,7 +335,7 @@ task armer(){
 			whiskeeeee = 0;
 			}else if(joy2Btn(10)){
 			whiskeeeee = 1;
-			//enev though it says 9
+			//even though it says 9
 			servo[wrist] = 0;
 			wait10Msec(70);
 			while(nMotorEncoder[arm] < 4753 && joystick.joy2_TopHat == -1){
@@ -353,6 +351,7 @@ task armer(){
 			motor[whisk] = 0;
 			whiskeeeee = 0;
 			// End Auto Buttons //
+			//TODO: Make auto button go up farther for fast dump.
 
 		}
 		abortTimeslice();
@@ -365,9 +364,10 @@ task whisker(){
 				motor[whisk] = 100;
 				}else if(joy2Btn(7)){
 				motor[whisk] = 100;
+				//reverse
 				}else if(joy2Btn(2)){
 				motor[whisk] = -50;
-			}else{
+				}else{
 				motor[whisk] = 0;
 			}
 		}
@@ -388,11 +388,14 @@ task lightcolor(){
 			motor[green] = 0;
 			motor[red] = 0;
 			motor[arm] = 0;
+			motor[lift] = 0;
+			motor[whisk] = 0;
 			}else{
 			color2 = "none";
 		}
 		if (didloosecon == 1 && bDisconnected == false){
 			color2 = "green";
+			//reset
 			didloosecon = 0;
 		}
 		abortTimeslice();
@@ -426,10 +429,10 @@ task main(){
 	StartTask(lightcolor);
 
 	StartTask(gyrodrive);
-	while(true){
-		nxtDisplayTextLine(1,"%f",servo[wrist]);
-		nxtDisplayTextLine(2,"%f",nMotorEncoder[arm]);
-	}
+	//while(true){
+	//	nxtDisplayTextLine(1,"%f",servo[wrist]);
+	//	nxtDisplayTextLine(2,"%f",nMotorEncoder[arm]);
+	//}
 }
 //verticle servo: 177 encoder: 475362
 //123 is for scooping [servo] 0 encoder
