@@ -42,6 +42,8 @@
 //#define touchSensor             msensor_S4_4
 
 
+int ex = 0;
+int correct = 0;
 
 
 void driveToInf(){
@@ -50,20 +52,20 @@ void driveToInf(){
 	nMotorEncoder[yellow] = 0;
 
 	while(nMotorEncoder[yellow] < 6500){
-		motor(red) = -30;
-		motor(yellow) = 30;
-		motor(green) = -30;
-		motor(blue) = 30;
-		if (SensorValue[INF] == 7){
-			firstsight = nMotorEncoder[yellow];
-			if(firstsight !=0 && SensorValue[INF] != 7){
-				secondsight = nMotorEncoder[yellow];
+		if (correct == 0){
+			motor(red) = -30;
+			motor(yellow) = 30;
+			motor(green) = -30;
+			motor(blue) = 30;
+			if (SensorValue[INF] == 5){
+				firstsight = nMotorEncoder[yellow];
+				if(firstsight !=0 && SensorValue[INF] != 5){
+					secondsight = nMotorEncoder[yellow];
+				}
 			}
 		}
-		while(nMotorEncoder[yellow] > ((secondsight - firstsight)/2.0)){
 
-
-			int ex = 0;
+		while(nMotorEncoder[yellow] < ((secondsight + firstsight)/2.0)){
 			if(nMotorEncoder[yellow] < 1000){
 				ex = 350;
 				}else if(nMotorEncoder[yellow] < 2000){
@@ -109,10 +111,12 @@ void returnto(){
 //this should correct if the robot drifts
 task correction(){
 	float rotSpeed = 0;
+	eraseDisplay();
+	disableDiagnosticsDisplay();
 	float heading = 0;
 
 	// Calibrating
-	HTGYROstartCal(HTGYRO);
+
 
 	// Reset the timer.
 	time1[T1] = 0;
@@ -133,62 +137,68 @@ task correction(){
 		the last time we measured.*/
 
 		//varience compinsator for integration with multiple tasks
-		nxtDisplayCenteredTextLine(2, "Timer: %2.3f", (time1[T1]));
-		heading += rotSpeed * (time1[T1] / 1000.0);
 
+		heading += rotSpeed * (time1[T1] / 1000.0);
+		nxtDisplayCenteredTextLine(2, "Timer: %2.3f", (time1[T1]));
 		// Reset timer
 		time1[T1]=0;
 
 		// Display degrees from start position
 
 		nxtDisplayCenteredTextLine(3, "Heading: %2.3f", heading);
-	}
 
-	//reset if over 360 degrees
-	if (heading >= 360){
-		heading = (heading - 360);
-	}
-	//reset if under 360
-	if (heading <= 0){
-		heading = (heading + 360);
-	}
 
-	if (heading >= 10 || heading <= -10){
-		//stop all the motors
-		motor[yellow] = 0;
-		motor[red] = 0;
-		motor[blue] = 0;
-		motor[green] = 0;
-		disableDiagnosticsDisplay();
-		nxtDisplayTextLine(2,"Changing Course");
-		while (heading >= 10 && heading <= -2){
-			//rotate robot until -2 degrees
-			motor[yellow] = 20;
-			motor[red] = 20;
-			motor[blue] = 20;
-			motor[green] = 20;
-			PlayTone(784,15);
+		//reset if over 360 degrees
+		if (heading >= 360){
+			heading = (heading - 360);
 		}
-		while (heading <= -10 && heading <= 2){
-			motor[yellow] = -20;
-			motor[red] = -20;
-			motor[blue] = -20;
-			motor[green] = -20;
-			PlayTone(784,15);
+		//reset if under 360
+		if (heading <= 0){
+			heading = (heading + 360);
 		}
+		nxtDisplayCenteredTextLine(4, "Herp");
+		if (heading >= 10 /*|| heading <= -10*/){
+			nxtDisplayCenteredTextLine(4, "Derp");
+			correct = 1;
+			//stop all the motors
+			motor[yellow] = 0;
+			motor[red] = 0;
+			motor[blue] = 0;
+			motor[green] = 0;
+			disableDiagnosticsDisplay();
+			nxtDisplayTextLine(1,"Changing Course");
+			if (heading >= 10){
+				while(heading >= -2){
+					PlayTone(622,38);
+					//rotate robot until -2 degrees
+					motor[yellow] = 20;
+					motor[red] = 20;
+					motor[blue] = 20;
+					motor[green] = 20;
+					PlayTone(784,15);
+				}
+			}
+			if (heading <= -10){
+				while (heading <= 2){
+					motor[yellow] = -20;
+					motor[red] = -20;
+					motor[blue] = -20;
+					motor[green] = -20;
+					PlayTone(784,15);
+				}
+			}
+			bDisplayDiagnostics = true;
+			correct = 0;
 
-		eraseDisplay();
-		bDisplayDiagnostics = true;
-
+		}
 	}
 }
-
 task main (){
 	disableDiagnosticsDisplay();
 	eraseDisplay();
 	color1 = red;
 	int button = 0;
-	int waittime = 0;
+	int waittime = 0;/*
 	nxtDisplayCenteredTextLine(3, "<-- Wait 15 sec");
 	nxtDisplayCenteredTextLine(2, "No wait -->");
 	while(waittime  == 0){
@@ -233,18 +243,15 @@ task main (){
 				wait10Msec(1500);
 			}
 		}
-	}
+	}*/
 
 	eraseDisplay();
 	bDisplayDiagnostics = true;
-
+	HTGYROstartCal(HTGYRO);
 	StartTask(blinker);
 	StartTask(correction);
 	color1 = "blue";
 	color2 = "none";
-	servo[wrist] = 0;
-	servo[autoflipper] = 240;
-	driveToInf();
-	returnto();
-
+	while(true){
+	}
 }
