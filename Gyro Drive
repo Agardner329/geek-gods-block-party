@@ -145,16 +145,25 @@ task drive(){
 
 
 task gyrodrive(){
-////////////////////////////////////////////////////////////////////////////////////
-//                                Gyro Mode Zone                                  //
-////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////
+	//                                Gyro Mode Zone                                  //
+	////////////////////////////////////////////////////////////////////////////////////
 
 	//enter gyro mode
 	// Hold down both buttons 9 and 10 (should be middle buttons) BE SURE ROBOT IS FACING AWAY FROM YOU.
 	while(true){
 		if (joy2Btn(3)){
-			// Calibrating & reset
+			//set to 0 before cal
+			color1 = "red";
+			motor[yellow] = 0;
+			motor[green] = 0;
+			motor[red] = 0;
+			motor[blue] = 0;
+			motor[arm] = 0;
 			HTGYROstartCal(HTGYRO);
+			color1 = "green";
+
+			// Calibrating & reset
 			heading = 0;
 		}
 		if((joy1Btn(9)) && (joy1Btn(10))){
@@ -172,7 +181,13 @@ task gyrodrive(){
 			heading = 0;
 
 			// Calibrating
-			HTGYROstartCal(HTGYRO);
+			color1 = "red";
+			motor[yellow] = 0;
+			motor[green] = 0;
+			motor[red] = 0;
+			motor[blue] = 0;
+			motor[arm] = 0;
+			color1 = "green";
 
 			// Reset the timer.
 			time1[T1] = 0;
@@ -215,6 +230,25 @@ task gyrodrive(){
 				long X = ((-joystick.joy1_x1)*cos((heading*PI)/180)) + ((-joystick.joy1_y1)*sin((heading*PI)/180));
 				long Y = ((-joystick.joy1_y1)*cos((heading*PI)/180)) - ((-joystick.joy1_x1)*sin((heading*PI)/180));
 
+
+				//float spin = joystick.joy1_x2;
+				//float theta = degreesToRadians(heading / 10);
+
+				// ==== adjust for gyro angle ====
+				//long x = ((-joystick.joy1_x1)*cos((heading*PI)/180)) + ((-joystick.joy1_y1)*sin((heading*PI)/180));
+				//long y = ((-joystick.joy1_y1)*cos((heading*PI)/180)) - ((-joystick.joy1_x1)*sin((heading*PI)/180));
+
+				//long y = joystick.joy1_y1 * cos(theta) - joystick.joy1_x1 * sin(theta);
+				//long x = joystick.joy1_y1 * sin(theta) + joystick.joy1_x1 * cos(theta);
+
+				float max = abs(motor[green]);
+				if (abs(motor[red])>max) max = abs(motor[red]);
+				if (abs(motor[blue])>max) max = abs(motor[blue]);
+				if (abs(motor[yellow])>max) max = abs(motor[yellow]);
+				if (max>1)
+				{motor[green]/=max; motor[red]/=max; motor[blue]/=max; motor[yellow]/=max;}
+
+				// ==== calculate speeds ====
 				motor(green) = DZ(X+Y+joystick.joy1_x2);
 				motor(blue) = DZ(Y-X+joystick.joy1_x2);
 				motor(red) = DZ(X-Y+joystick.joy1_x2);
@@ -288,7 +322,7 @@ task armer(){
 
 		float smoothed_array = ((values[0]+values[1]+values[2]+values[3]+values[4]+values[5]+values[6]+values[7]+values[8]+values[9])/10);
 		if(smoothed_array < 0){
-			if(nMotorEncoder[arm] < -10){
+			if(nMotorEncoder[arm] < 10){
 				motor[arm] = 0;
 				}else{
 				if(nMotorEncoder[arm] > 9000){
@@ -338,7 +372,7 @@ task armer(){
 			//even though it says 9
 			servo[wrist] = 0;
 			wait10Msec(70);
-			while(nMotorEncoder[arm] < 4753 && joystick.joy2_TopHat == -1){
+			while(nMotorEncoder[arm] < 6647 && joystick.joy2_TopHat == -1){
 				motor[arm] = 30;
 				motor[whisk] = 20;
 				if(nMotorEncoder[arm] > 1000){
@@ -347,7 +381,7 @@ task armer(){
 				}
 			}
 			motor[arm] = 0;
-			servo[wrist] = 177;
+			servo[wrist] = 255;
 			motor[whisk] = 0;
 			whiskeeeee = 0;
 			// End Auto Buttons //
@@ -409,6 +443,7 @@ task main(){
 	nMotorEncoder[arm] = 0;
 	servo[wrist] = 0;
 	// make freaking sure the arm is down
+	HTGYROstartCal(HTGYRO);
 	waitForStart();
 	StartTask(directionCont);
 
@@ -429,10 +464,10 @@ task main(){
 	StartTask(lightcolor);
 
 	StartTask(gyrodrive);
-	//while(true){
-	//	nxtDisplayTextLine(1,"%f",servo[wrist]);
-	//	nxtDisplayTextLine(2,"%f",nMotorEncoder[arm]);
-	//}
+	while(true){
+		nxtDisplayTextLine(1,"%f",servo[wrist]);
+		nxtDisplayTextLine(2,"%f",nMotorEncoder[arm]);
+	}
 }
 //verticle servo: 177 encoder: 475362
 //123 is for scooping [servo] 0 encoder
