@@ -6,7 +6,10 @@ string color1 = "red";
 string color2 = "none";
 
 //this will show 'color1' for .5 sec then 'color2' and so on.
+
+//THIS USES TIMER 2 SO DON'T USE IT OTHER PLACES
 task blinker(){
+	time1[T2] = 0;
 	while(true){
 		if (color1 == "red"){
 			SensorType[RGB] = sensorCOLORRED;
@@ -19,7 +22,9 @@ task blinker(){
 		}else{
 			SensorType[RGB] = sensorCOLORNONE;
 		}
-		wait10Msec(50);
+		while (time1[T2] < 500)
+			wait1Msec(1);
+		time1[T2] = 0;
 
 		if (color2 == "red"){
 			SensorType[RGB] = sensorCOLORRED;
@@ -32,7 +37,9 @@ task blinker(){
 		}else{
 			SensorType[RGB] = sensorCOLORNONE;
 		}
-		wait10Msec(50);
+		while (time1[T2] < 500)
+			wait1Msec(1);
+		time1[T2] = 0;
 		}
 
 	}
