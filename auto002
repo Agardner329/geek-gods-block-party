@@ -1,18 +1,3 @@
-
-
-
-
-
-
-DIS BE CHECKED OUT SON.
-
-
-
-
-
-
-
-
 #pragma config(Hubs,  S1, HTMotor,  HTMotor,  HTMotor,  HTMotor)
 #pragma config(Hubs,  S3, HTServo,  none,     none,     none)
 #pragma config(Sensor, S1,     ,               sensorI2CMuxController)
@@ -61,7 +46,9 @@ DIS BE CHECKED OUT SON.
 #define HTGYRO              msensor_S2_4
 #define INF          msensor_S2_3
 float heading = 0;
-float heading2=4;
+float heading2 = 4;
+int back = 0;
+int truncate = 0;
 
 void allStop(){
 	motor[yellow] = 0;
@@ -74,14 +61,14 @@ void ramp(){
 	heading = 0;
 	float localHeading = 0;
 	heading2 = 0;
-	
+
 	//drive in front of ramp
 	motor[blue] = 50;
 	wait10Msec(10);
 	motor[red] = -50;
 	wait10Msec(300);
 	allStop();
-	
+
 	//turn to face ramp
 	motor[red] = -10;
 	motor[yellow] = -10;
@@ -94,10 +81,10 @@ void ramp(){
 	nMotorEncoder[yellow] = 0;
 	nMotorEncoder[green] = 0;
 	while (nMotorEncoder[yellow] < -3000 || nMotorEncoder[green] > 3000 ){//go to apex of ramp
-	motor[red] = -100;
-	motor[yellow] = -100;
-	motor[green] = 100;
-	motor[blue] = 100;
+		motor[red] = -100;
+		motor[yellow] = -100;
+		motor[green] = 100;
+		motor[blue] = 100;
 	}
 	allStop();
 	while(true){//pause while on the ramp until the end of autonomous.
@@ -105,6 +92,14 @@ void ramp(){
 	}
 }
 
+void recall(){
+	//drive back to start position
+	while (nMotorEncoder[yellow] >= 0 || nMotorEncoder[green] <= 0){
+		motor[green] = 30;
+		motor[yellow] = -30;
+	}
+	//insert some get on ramp stuff here.
+}
 
 task gyro(){
 	float rotSpeed = 0;
@@ -163,9 +158,13 @@ void dump(){
 		localHeading=heading2;
 	}
 	allStop();
-	time1[T1] = 0;
-	//keep friving to end and a bit more
-	while (nMotorEncoder[yellow] <= 8750 || nMotorEncoder[green] >= -8750 && time1[T1] < 1500){
+	//if come back was selected
+	if (back == 1)
+		recall();
+
+	time1[T3] = 0;
+	//keep driving to end and a bit more
+	while (nMotorEncoder[yellow] <= 8750 || nMotorEncoder[green] >= -8750 && time1[T3] < 1500){
 		motor[green] = -30;
 		motor[yellow] = 30;
 	}
@@ -194,6 +193,8 @@ void drive(){
 	}
 	PlayTone(622,38);
 	if (HTIRS2readDCDir(INF) == 3){
+		if (back == 1)
+			recall();
 		dump();
 	}
 	//===secoend bucket===
@@ -214,6 +215,9 @@ void drive(){
 	if (HTIRS2readDCDir(INF) == 3){
 		dump();
 	}
+	//dump anyway if truncate was selected
+	if (truncate == 1)
+		dump();
 	//===fourth bucket===
 	while (nMotorEncoder[yellow] < 5350 || nMotorEncoder[green] > -5350 ){//fourth 5850
 		motor[green] = -30;
@@ -243,52 +247,105 @@ task main (){
 	disableDiagnosticsDisplay();
 	eraseDisplay();
 	color1 = red;
-	/*int button = 0;
+	int button = 0;
 	int waittime = 0;
+	int back = 0;
+	int truncate = 0;
+	//add opposite side?
+
+	//wait 15 sec option
 	nxtDisplayCenteredTextLine(3, "<-- Wait 15 sec");
 	nxtDisplayCenteredTextLine(2, "No wait -->");
 	while(waittime  == 0){
-	if(nNxtButtonPressed == 2){
-	waittime = 2;
-	button = 2;
-	//wait mode
-	wait1Msec(10);
-	}
-	if(nNxtButtonPressed == 1){
-	waittime = 1;
-	button = 1;
-	//no wait
-	}
+		if(nNxtButtonPressed == 2){
+			waittime = 2;
+			button = 2;
+			//wait mode
+			wait1Msec(10);
+		}
+		if(nNxtButtonPressed == 1){
+			waittime = 1;
+			button = 1;
+			//no wait
+		}
 	}
 	while(nNxtButtonPressed == button){
-	wait10Msec(10);
+		wait10Msec(10);
 	}
 
+	//Truncate run after third bin, should probably be combined with the come back part
+	button = 0;
+	eraseDisplay();
+	nxtDisplayCenteredTextLine(3, "<-- Truncate");
+	nxtDisplayCenteredTextLine(2, "Full Run-->");
+	while(truncate == 0){
+		if(nNxtButtonPressed == 2){
+			truncate = 1;
+			button = 2;
+			//truncate
+			wait1Msec(10);
+		}
+		if(nNxtButtonPressed == 1){
+			truncate = 0;
+			button = 1;
+			//proceedes with a full run.
+		}
+	}
+	//stops the NXT from skipping ahead
+	while(nNxtButtonPressed == button){
+		wait10Msec(10);
+	}
+
+
+
+	//Come back after dump option
+	button = 0;
+	eraseDisplay();
+	nxtDisplayCenteredTextLine(3, "<-- Come back");
+	nxtDisplayCenteredTextLine(2, "Go on -->");
+	while(back == 0){
+		if(nNxtButtonPressed == 2){
+			back = 1;
+			button = 2;
+			//comes back
+			wait1Msec(10);
+		}
+		if(nNxtButtonPressed == 1){
+			back = 0;
+			button = 1;
+			//goes ahead
+		}
+	}
+	while(nNxtButtonPressed == button){
+		wait10Msec(10);
+	}
+
+	//test mode or tournament option
 	int waitstart = 0;
 	nxtDisplayCenteredTextLine(3, "<-- Test Mode");
 	nxtDisplayCenteredTextLine(2, "Tournament -->");
 	while(waitstart  == 0){
-	if(nNxtButtonPressed == 2){
-	nxtDisplayCenteredTextLine(3, "On test mode");
-	waitstart = 1;
-	if (waittime == 2){
-	wait10Msec(1500);
-	}
-	//test
-	}
-	if(nNxtButtonPressed == 1){
-	waitstart = 1;
-	//tournament
-	nxtDisplayCenteredTextLine(2, "Waiting");
-	nxtDisplayCenteredTextLine(3, "for Start");
-	color1 = "blue";
+		if(nNxtButtonPressed == 2){
+			nxtDisplayCenteredTextLine(3, "On test mode");
+			waitstart = 1;
+			if (waittime == 2){
+				wait10Msec(1500);
+			}
+			//test mode
+		}
+		if(nNxtButtonPressed == 1){
+			waitstart = 1;
+			//tournament mode
+			nxtDisplayCenteredTextLine(2, "Waiting");
+			nxtDisplayCenteredTextLine(3, "for Start");
+			color1 = "blue";
 
-	waitForStart();
-	if (waittime == 2){
-	wait10Msec(1500);
+			waitForStart();
+			if (waittime == 2){
+				wait10Msec(1500);
+			}
+		}
 	}
-	}
-	}*/
 	PlayTone(322,33);
 	drive();
 	eraseDisplay();
