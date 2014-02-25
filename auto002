@@ -22,14 +22,6 @@
 
 // auto002.c
 
-
-
-
-
-//I CHANGED THE RAMP DRIVE TO ENCODER - JESSE
-
-
-
 //the SMUX is plugged into PORT 2
 //   the gyro is in port 4 of the SMUX
 //   the ir is in port 3 of the SMUX
@@ -59,6 +51,12 @@ void allStop(){
 
 void ramp(){
 	heading = 0;
+	motor[blue] = 50;
+	motor[red] = -50;
+	motor[yellow] = 50;
+	motor[green] = -50;
+	wait10Msec(50);
+	allstop();
 	float localHeading = 0;
 	heading2 = 0;
 
@@ -74,13 +72,13 @@ void ramp(){
 	motor[yellow] = -10;
 	motor[green] = -10;
 	motor[blue] = -10;
-	wait10Msec(150);
+	wait10Msec(130);
 	allStop();
 
 	//drive onto ramp
 	nMotorEncoder[yellow] = 0;
 	nMotorEncoder[green] = 0;
-	while (nMotorEncoder[yellow] < -3000 || nMotorEncoder[green] > 3000 ){//go to apex of ramp
+	while (nMotorEncoder[yellow] > -4000 || nMotorEncoder[green] < 4000 ){//go to apex of ramp
 		motor[red] = -100;
 		motor[yellow] = -100;
 		motor[green] = 100;
@@ -164,7 +162,7 @@ void dump(){
 
 	time1[T3] = 0;
 	//keep driving to end and a bit more
-	while (nMotorEncoder[yellow] <= 8750 || nMotorEncoder[green] >= -8750 && time1[T3] < 1500){
+	while (nMotorEncoder[yellow] <= 8500 || nMotorEncoder[green] >= -8500 && time1[T3] < 1500){
 		motor[green] = -30;
 		motor[yellow] = 30;
 	}
@@ -212,7 +210,7 @@ void drive(){
 		motor[yellow] = 30;
 	}
 	PlayTone(622,38);
-	if (HTIRS2readDCDir(INF) == 3){
+	if (HTIRS2readDCDir(INF) == 3 || HTIRS2readDCDir(INF) == 4){
 		dump();
 	}
 	//dump anyway if truncate was selected
@@ -246,14 +244,15 @@ task main (){
 	servo[autoflipper] = 240;
 	disableDiagnosticsDisplay();
 	eraseDisplay();
-	color1 = red;
+	color1 = "red";
 	int button = 0;
 	int waittime = 0;
 	int back = 0;
 	int truncate = 0;
 	//add opposite side?
 
-	//wait 15 sec option
+	//wait 15 sec 
+	/*
 	nxtDisplayCenteredTextLine(3, "<-- Wait 15 sec");
 	nxtDisplayCenteredTextLine(2, "No wait -->");
 	while(waittime  == 0){
@@ -261,7 +260,6 @@ task main (){
 			waittime = 2;
 			button = 2;
 			//wait mode
-			wait1Msec(10);
 		}
 		if(nNxtButtonPressed == 1){
 			waittime = 1;
@@ -275,15 +273,15 @@ task main (){
 
 	//Truncate run after third bin, should probably be combined with the come back part
 	button = 0;
+	truncate	= 2;
 	eraseDisplay();
 	nxtDisplayCenteredTextLine(3, "<-- Truncate");
 	nxtDisplayCenteredTextLine(2, "Full Run-->");
-	while(truncate == 0){
+	while(truncate == 2){
 		if(nNxtButtonPressed == 2){
 			truncate = 1;
 			button = 2;
 			//truncate
-			wait1Msec(10);
 		}
 		if(nNxtButtonPressed == 1){
 			truncate = 0;
@@ -300,10 +298,11 @@ task main (){
 
 	//Come back after dump option
 	button = 0;
+	back = 2;
 	eraseDisplay();
 	nxtDisplayCenteredTextLine(3, "<-- Come back");
 	nxtDisplayCenteredTextLine(2, "Go on -->");
-	while(back == 0){
+	while(back == 2){
 		if(nNxtButtonPressed == 2){
 			back = 1;
 			button = 2;
@@ -328,6 +327,7 @@ task main (){
 		if(nNxtButtonPressed == 2){
 			nxtDisplayCenteredTextLine(3, "On test mode");
 			waitstart = 1;
+			wait10Msec(100);
 			if (waittime == 2){
 				wait10Msec(1500);
 			}
@@ -345,7 +345,7 @@ task main (){
 				wait10Msec(1500);
 			}
 		}
-	}
+	}*/
 	PlayTone(322,33);
 	drive();
 	eraseDisplay();
