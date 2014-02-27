@@ -51,12 +51,22 @@ void allStop(){
 
 void ramp(){
 	heading = 0;
-	motor[blue] = 50;
-	motor[red] = -50;
-	motor[yellow] = 50;
-	motor[green] = -50;
-	wait10Msec(50);
-	allstop();
+	nMotorEncoder[yellow] = 0;
+	nMotorEncoder[green] = 0;
+	while (nMotorEncoder[yellow] < 2000 || nMotorEncoder[green] > -2000 ){//do that straffing thingy to avoid wood. Numbers might be wrong
+		motor[red] = -50;
+		motor[yellow] = 50;
+		motor[green] = -50;
+		motor[blue] = 50;
+	}
+	//old thing
+	//motor[blue] = 50;
+	//motor[red] = -50;
+	//motor[yellow] = 50;
+	//motor[green] = -50;
+	//wait10Msec(50);
+
+	allStop();
 	float localHeading = 0;
 	heading2 = 0;
 
@@ -67,15 +77,30 @@ void ramp(){
 	wait10Msec(300);
 	allStop();
 
-	//turn to face ramp
+	//turn to face ramp with GYRO
 	motor[red] = -10;
 	motor[yellow] = -10;
 	motor[green] = -10;
 	motor[blue] = -10;
-	wait10Msec(130);
+
+	localHeading=heading2;
+	eraseDisplay();
+	while (localHeading < -45){
+		PlayTone(622,38);
+		nxtDisplayCenteredTextLine(6, "Heading: %2.3f", localHeading);
+		localHeading=heading2;
+	}
 	allStop();
 
-	//drive onto ramp
+	//old turning thing
+	//motor[red] = -10;
+	//motor[yellow] = -10;
+	//motor[green] = -10;
+	//motor[blue] = -10;
+	//wait10Msec(130);
+	//allStop();
+
+	//drive up on that ramp, man
 	nMotorEncoder[yellow] = 0;
 	nMotorEncoder[green] = 0;
 	while (nMotorEncoder[yellow] > -4000 || nMotorEncoder[green] < 4000 ){//go to apex of ramp
@@ -85,6 +110,8 @@ void ramp(){
 		motor[blue] = 100;
 	}
 	allStop();
+	eraseDisplay();
+	nxtDisplayCenteredTextLine(3, "All Finished");
 	while(true){//pause while on the ramp until the end of autonomous.
 		wait10Msec(1);
 	}
@@ -252,7 +279,7 @@ task main (){
 	//add opposite side?
 
 	//wait 15 sec 
-	/*
+
 	nxtDisplayCenteredTextLine(3, "<-- Wait 15 sec");
 	nxtDisplayCenteredTextLine(2, "No wait -->");
 	while(waittime  == 0){
@@ -345,7 +372,8 @@ task main (){
 				wait10Msec(1500);
 			}
 		}
-	}*/
+	}
+	color1 = "blue";
 	PlayTone(322,33);
 	drive();
 	eraseDisplay();
