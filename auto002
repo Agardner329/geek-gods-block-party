@@ -107,7 +107,8 @@ void ramp(){
 	//drive up on that ramp, man
 	nMotorEncoder[yellow] = 0;
 	nMotorEncoder[green] = 0;
-	while (nMotorEncoder[yellow] > -4000 || nMotorEncoder[green] < 4000 ){//go to apex of ramp
+	time1[T4] = 0;
+	while (nMotorEncoder[yellow] > -4000 && nMotorEncoder[green] < 4000 && time1[T4] < 2000 ){//go to apex of ramp
 		motor[red] = -100;
 		motor[yellow] = -100;
 		motor[green] = 100;
@@ -131,7 +132,7 @@ void recall(){
 		motor[green] = 30;
 		motor[yellow] = -30;
 	}
-	allstop();
+	allStop();
 	motor[yellow] = -50;
 	motor[red] = -50;
 	motor[blue] = 50;
@@ -143,24 +144,30 @@ void recall(){
 	allStop();
 	motor[blue] = 50;
 	motor[red] = -50;
-	wait10Msec(200);
+	wait10Msec(300);
 	allStop();
+	wait10Msec(1);
 	motor[yellow] = -30;
 	motor[red] = -30;
 	motor[blue] = -30;
 	motor[green] = -30;
-	while (localHeading > -43){
+	heading2 = heading;
+	localHeading=heading2;
+
+	while (localHeading > -32){
 		PlayTone(622,38);
 		nxtDisplayCenteredTextLine(6, "Heading: %2.3f", localHeading);
 		localHeading=heading2;
 	}
+	allStop();
 	nMotorEncoder[yellow] = 0;
 	nMotorEncoder[green] = 0;
-	motor[red] = 100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
-	motor[yellow] = 100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
-	motor[green] = -100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
-	motor[blue] = -100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
-	while (nMotorEncoder[green] > -4000 || nMotorEncoder[green] < 4000 ){//go to apex of ramp
+	motor[red] = 100;
+	motor[green] = -100;
+	motor[blue] = -100;
+	motor[yellow] = 100;
+	time1[T4] = 0;
+	while (nMotorEncoder[green] > -4000 && nMotorEncoder[green] < 4000 && time1[T4] < 2000 ){//go to apex of ramp
 	}
 	allStop();
 	while(true){
@@ -298,8 +305,10 @@ void drive(){
 		dump();
 	}
 	//dump anyway if truncate was selected
-	if (truncate == 1)
+	if (truncate == 1){
+		isthree = 1;
 		dump();
+	}
 	//===fourth bucket===
 	while (nMotorEncoder[yellow] < 5350 || nMotorEncoder[green] > -5350 ){//fourth 5850
 		motor[green] = -30;
@@ -434,5 +443,9 @@ task main (){
 	while(true){
 		nxtDisplayCenteredTextLine(4, "encoder: %2.3f", (nMotorEncoder[yellow]));
 		nxtDisplayCenteredTextLine(3, "IR: %i", HTIRS2readDCDir(INF));
+		if (HTSMUXreadPowerStatus(HTSMUX))
+			nxtDisplayTextLine(7, "SMUX Batt: bad");
+		else
+			nxtDisplayTextLine(7, "SMUX Batt: good");
 	}
 }
