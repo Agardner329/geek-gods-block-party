@@ -309,45 +309,12 @@ task flagger(){
 	}
 }
 task armer(){
-	// Start Array Smoothing //
-	int number = 0;
-	float values[10] = {0,0,0,0,0,0,0,0,0,0};
 	while(true){
-		getJoystickSettings(joystick);
-		if(number > 9){
-			number = 0;
+		if(nMotorEncoder[arm] < 10 || nMotorEncoder[arm] > 9000){
+			motor[arm] = 0;
+		}else{
+			motor[arm] = ((DZ(joystick.joy2_y1)/128)*100);
 		}
-
-		values[number] = joystick.joy2_y1;
-
-		float smoothed_array = ((values[0]+values[1]+values[2]+values[3]+values[4]+values[5]+values[6]+values[7]+values[8]+values[9])/10);
-		if(smoothed_array < 0){
-			if(nMotorEncoder[arm] < 10){
-				motor[arm] = 0;
-				}else{
-				if(nMotorEncoder[arm] > 9000){
-					if(smoothed_array > 0){
-						motor[arm] = 0;
-						}else{
-						motor[arm] = (DZ(smoothed_array)/2);
-					}
-					}else{
-					motor[arm] = (DZ(smoothed_array)/2);
-				}
-			}
-			}else{
-			if(nMotorEncoder[arm] > 9000){
-				if(smoothed_array > 0){
-					motor[arm] = 0;
-					}else{
-					motor[arm] = (DZ(smoothed_array)/2);
-				}
-				}else{
-				motor[arm] = (DZ(smoothed_array)/2);
-			}
-		}
-
-		number ++;
 		wait10Msec(3);
 		servo[wrist] -= ((DZ(joystick.joy2_y2))/20);
 		// End Array Smoothing //
@@ -363,7 +330,7 @@ task armer(){
 				motor[whisk] = 20;
 			}
 			motor[arm] = 0;
-			servo[wrist] = 123;
+			servo[wrist] = 124;
 			wait10Msec(100);
 			motor[whisk] = 0;
 			whiskeeeee = 0;
@@ -470,4 +437,4 @@ task main(){
 	}
 }
 //verticle servo: 177 encoder: 475362
-//123 is for scooping [servo] 0 encoder
+//124 is for scooping [servo] 0 encoder
