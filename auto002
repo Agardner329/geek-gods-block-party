@@ -28,12 +28,12 @@
 
 #include "JoystickDriver.c";
 #include "statuslight.c";
-#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-sensormux.h"
+#include "Sample Programs/NXT/3rd Party Sensor Drivers/drivers/XanderDriverSuite/rdpartyrobotcdr-3.3.1/drivers/hitechnic-sensormux.h"
 
-#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-gyro.h"    //for gyro sensor
-#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-colour-v2.h"   //for color sensor
-#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\hitechnic-irseeker-v2.h"    //for IR seeker sensor
-//#include "Sample Programs\NXT\3rd Party Sensor Drivers\drivers\XanderDriverSuite\rdpartyrobotcdr-3.3.1\drivers\LEGOTS-driver.h"    //for touch sensor
+#include "Sample Programs/NXT/3rd Party Sensor Drivers/drivers/XanderDriverSuite/rdpartyrobotcdr-3.3.1/drivers/hitechnic-gyro.h"    //for gyro sensor
+#include "Sample Programs/NXT/3rd Party Sensor Drivers/drivers/XanderDriverSuite/rdpartyrobotcdr-3.3.1/drivers/hitechnic-colour-v2.h"   //for color sensor
+#include "Sample Programs/NXT/3rd Party Sensor Drivers/drivers/XanderDriverSuite/rdpartyrobotcdr-3.3.1/drivers/hitechnic-irseeker-v2.h"    //for IR seeker sensor
+//#include "Sample Programs/NXT/3rd Party Sensor Drivers/drivers/XanderDriverSuite/rdpartyrobotcdr-3.3.1/drivers/LEGOTS-driver.h"    //for touch sensor
 
 #define HTGYRO              msensor_S2_4
 #define INF          msensor_S2_3
@@ -41,7 +41,9 @@ float heading = 0;
 float heading2 = 4;
 int back = 0;
 int truncate = 0;
+int isthree = 0;
 
+////////////////////////////////////////////Allstop Below//////////////////////////////////////////////////////////////////
 void allStop(){
 	motor[yellow] = 0;
 	motor[green] = 0;
@@ -49,6 +51,8 @@ void allStop(){
 	motor[red] = 0;
 }
 
+////////////////////////////////////////////Allstop Above///////////////////////////////////////////////////////////////
+////////////////////////////////////////////Ramp Below//////////////////////////////////////////////////////////////////
 void ramp(){
 	heading = 0;
 	nMotorEncoder[yellow] = 0;
@@ -74,7 +78,7 @@ void ramp(){
 	motor[blue] = 50;
 	wait10Msec(10);
 	motor[red] = -50;
-	wait10Msec(300);
+	wait10Msec(200);
 	allStop();
 
 	//turn to face ramp with GYRO
@@ -85,7 +89,7 @@ void ramp(){
 
 	localHeading=heading2;
 	eraseDisplay();
-	while (localHeading < -45){
+	while (localHeading > -45){
 		PlayTone(622,38);
 		nxtDisplayCenteredTextLine(6, "Heading: %2.3f", localHeading);
 		localHeading=heading2;
@@ -117,14 +121,55 @@ void ramp(){
 	}
 }
 
+////////////////////////////////////////////Ramp Above////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////Recall Below//////////////////////////////////////////////////////////////////
 void recall(){
+	float localHeading = 0;
+	heading2 = 0;
 	//drive back to start position
-	while (nMotorEncoder[yellow] >= 0 || nMotorEncoder[green] <= 0){
+	while (nMotorEncoder[yellow] >= 900 || nMotorEncoder[green] <= -900){
 		motor[green] = 30;
 		motor[yellow] = -30;
 	}
-	//insert some get on ramp stuff here.
+	allstop();
+	motor[yellow] = -50;
+	motor[red] = -50;
+	motor[blue] = 50;
+	motor[green] = 50;
+	nMotorEncoder[yellow] = 0;
+	nMotorEncoder[green] = 0;
+	while (nMotorEncoder[yellow] > -750 || nMotorEncoder[green] < 750 ){
+	}
+	allStop();
+	motor[blue] = 50;
+	motor[red] = -50;
+	wait10Msec(200);
+	allStop();
+	motor[yellow] = -30;
+	motor[red] = -30;
+	motor[blue] = -30;
+	motor[green] = -30;
+	while (localHeading > -43){
+		PlayTone(622,38);
+		nxtDisplayCenteredTextLine(6, "Heading: %2.3f", localHeading);
+		localHeading=heading2;
+	}
+	nMotorEncoder[yellow] = 0;
+	nMotorEncoder[green] = 0;
+	motor[red] = 100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
+	motor[yellow] = 100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
+	motor[green] = -100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
+	motor[blue] = -100;//////////////////////////////////////////DODODODODODODNTOTNOTNTOT mbe 100.
+	while (nMotorEncoder[green] > -4000 || nMotorEncoder[green] < 4000 ){//go to apex of ramp
+	}
+	allStop();
+	while(true){
+	}
+
 }
+
+////////////////////////////////////////////Recall Above///////////////////////////////////////////////////////
+////////////////////////////////////////////Gyro Below//////////////////////////////////////////////////////////
 
 task gyro(){
 	float rotSpeed = 0;
@@ -148,7 +193,17 @@ task gyro(){
 	}
 }
 
+////////////////////////////////////////////Gyro Above//////////////////////////////////////////////////////////////////
+////////////////////////////////////////////Dump Below//////////////////////////////////////////////////////////////////
 void dump(){
+	int isback;
+	isback = back;
+	if(isthree == 1){
+		while (nMotorEncoder[yellow] > 4500 || nMotorEncoder[green] < -4500 ){
+			motor[green] = 30;
+			motor[yellow] = -30;
+		}
+	}
 	StartTask(gyro);
 	heading = 0;
 	heading2 = 0;
@@ -184,15 +239,21 @@ void dump(){
 	}
 	allStop();
 	//if come back was selected
-	if (back == 1)
-		recall();
 
-	time1[T3] = 0;
+	eraseDisplay();
+
+	if (isback == 1){
+		recall();
+		nxtDisplayCenteredTextLine(1,"Recalled");
+	}
+
 	//keep driving to end and a bit more
-	while (nMotorEncoder[yellow] <= 8500 || nMotorEncoder[green] >= -8500 && time1[T3] < 1500){
+	while (nMotorEncoder[yellow] <= 8500 && nMotorEncoder[green] >= -8500 && time1[T3] < 30000){
 		motor[green] = -30;
 		motor[yellow] = 30;
+		nxtDisplayCenteredTextLine(1,"Time: %f", time1[T3]);
 	}
+
 
 	allStop();
 	ramp();
@@ -201,13 +262,10 @@ void dump(){
 
 }//END DUMP SECTION
 
-
-
-
-
-
-
+////////////////////////////////////////////Dump Above///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////Drive Below//////////////////////////////////////////////////////////////////
 void drive(){
+	time1[T3] = 0;
 	nMotorEncoder[yellow] = 0;
 	nMotorEncoder[green] = 0;
 	//herro frind
@@ -218,8 +276,6 @@ void drive(){
 	}
 	PlayTone(622,38);
 	if (HTIRS2readDCDir(INF) == 3){
-		if (back == 1)
-			recall();
 		dump();
 	}
 	//===secoend bucket===
@@ -232,12 +288,13 @@ void drive(){
 		dump();
 	}
 	//===third bucket===
-	while (nMotorEncoder[yellow] < 4300 || nMotorEncoder[green] > -4300 ){//third 4800
+	while (nMotorEncoder[yellow] < 4500 || nMotorEncoder[green] > -4500 ){//third 4800
 		motor[green] = -30;
 		motor[yellow] = 30;
 	}
 	PlayTone(622,38);
-	if (HTIRS2readDCDir(INF) == 3 || HTIRS2readDCDir(INF) == 4){
+	if (HTIRS2readDCDir(INF) == 3){
+		isthree = 1;
 		dump();
 	}
 	//dump anyway if truncate was selected
@@ -257,11 +314,10 @@ void drive(){
 	}
 }
 
-
-
-
-
+////////////////////////////////////////////Drive Above/////////////////////////////////////////////////////////////////
+////////////////////////////////////////////Main Below//////////////////////////////////////////////////////////////////
 task main (){
+	int isthree = 0;
 
 	StartTask(blinker);
 	color1 = "red";
@@ -274,11 +330,9 @@ task main (){
 	color1 = "red";
 	int button = 0;
 	int waittime = 0;
-	int back = 0;
-	int truncate = 0;
 	//add opposite side?
 
-	//wait 15 sec 
+	//wait 15 sec
 
 	nxtDisplayCenteredTextLine(3, "<-- Wait 15 sec");
 	nxtDisplayCenteredTextLine(2, "No wait -->");
