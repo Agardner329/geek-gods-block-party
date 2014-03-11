@@ -49,7 +49,7 @@ void initializeRobot(){
 	return;
 }
 float DZ(float input){
-	if(input > -10 && input < 10){
+	if(input > -15 && input < 15){
 		return 0;
 		}else{
 		return input;
@@ -310,10 +310,20 @@ task flagger(){
 }
 task armer(){
 	while(true){
-		if(nMotorEncoder[arm] < 10 || nMotorEncoder[arm] > 9000){
-			motor[arm] = 0;
+		if(nMotorEncoder[arm] < 10){
+			if(DZ(joystick.joy2_y1) < 0){
+				motor[arm] = 0;
+			}else{
+				motor[arm] = (((DZ(joystick.joy2_y1))/128)*25);
+			}
+		}else if(nMotorEncoder[arm] > 9000){
+			if(DZ(joystick.joy2_y1) > 0){
+				motor[arm] = 0;
+			}else{
+				motor[arm] = (((DZ(joystick.joy2_y1))/128)*25);
+			}
 		}else{
-			motor[arm] = ((DZ(joystick.joy2_y1)/128)*100);
+			motor[arm] = (((DZ(joystick.joy2_y1))/128)*25);
 		}
 		wait10Msec(3);
 		servo[wrist] -= ((DZ(joystick.joy2_y2))/20);
